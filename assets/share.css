@@ -313,19 +313,61 @@ body{
     order:2;
     width:min(var(--content-max, 376px), 100%);
     max-width:var(--content-max, 376px);
-    aspect-ratio:376 / 343;
+    aspect-ratio:826 / 572;
     height:auto;
     margin:0 auto;
     flex-shrink:0;
   }
 
   .share-preview{
-    position:relative;
+    position:absolute;
+    inset:0;
     left:auto;
     top:auto;
     width:100%;
     height:100%;
     margin:0;
+  }
+
+  /* Full postcard renders — not welcome envelope composition */
+  .share-preview .share-envelope{
+    display:none;
+  }
+
+  .share-card-front,
+  .share-card-back{
+    position:absolute;
+    inset:0;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    margin:0;
+    object-fit:contain;
+    object-position:center center;
+    transform:none;
+    transform-origin:center center;
+    transition:opacity .35s ease;
+  }
+
+  .share-preview.is-ready .share-card-back{
+    opacity:0;
+  }
+
+  .share-preview.is-ready .share-card-front{
+    opacity:1;
+  }
+
+  .share-preview.is-flipped .share-card-back{
+    opacity:1;
+    transform:none;
+    z-index:2;
+  }
+
+  .share-preview.is-flipped .share-card-front{
+    opacity:0;
+    transform:none;
+    z-index:1;
   }
 
   .share-panel{

@@ -150,8 +150,8 @@
   .share-card-slot,
   .share-preview {
     margin-top: 0 !important;
-    width: min(var(--content-max), calc(100vw - 64px), 241px) !important;
-    aspect-ratio: 376 / 343;
+    width: min(var(--content-max), calc(100vw - 64px), 320px) !important;
+    aspect-ratio: 826 / 572;
     height: auto !important;
     flex-shrink: 1;
     min-height: 0;
@@ -287,8 +287,7 @@
     overflow: visible;
   }
 
-  .welcome-envelope,
-  .share-envelope {
+  .welcome-envelope {
     position: absolute;
     top: 0;
     left: 6.94%;
@@ -301,9 +300,7 @@
   }
 
   .welcome-card-front,
-  .welcome-card-back,
-  .share-card-front,
-  .share-card-back {
+  .welcome-card-back {
     position: absolute;
     top: 28.85%;
     left: 0;
