@@ -1,5 +1,8 @@
 import { supabase } from './supabaseClient.js';
 import { resolvePhotoForStorage } from './imageUpload.js';
+import { normalizePostcardStyle, resolvePostcardStyle, POSTCARD_STYLES } from './postcardStyle.js';
+
+export { normalizePostcardStyle, resolvePostcardStyle, POSTCARD_STYLES };
 
 export const POSTCARD_SHARE_ID_SESSION_KEY = 'postcard:lastShareId';
 
@@ -45,22 +48,23 @@ export function syncShareIdInUrl(shortCode, url = window.location.href){
   return next.href;
 }
 
-export function buildPostcardViewUrl(shortCode, { style } = {}){
+export function buildPostcardViewUrl(shortCode){
   const url = new URL('/postcard-view.html', window.location.origin);
   url.searchParams.set('id', shortCode);
-  if(style && style !== 'modern'){
-    url.searchParams.set('style', style);
-  }
   return url.href;
 }
 
 export async function savePostcard(content, { photoBlob } = {}){
+  const style = normalizePostcardStyle(content?.style)
+    ?? normalizePostcardStyle(content?.data?.style)
+    ?? 'modern';
   const data = {
     ...content.data,
     photo: await resolvePhotoForStorage(content.data?.photo, photoBlob),
   };
   const payload = {
     ...content,
+    style,
     data,
   };
   const { data: shortCode, error } = await supabase.rpc('create_postcard', {

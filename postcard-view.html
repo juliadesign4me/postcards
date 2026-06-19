@@ -66,7 +66,7 @@
 
 <script type="module" src="assets/postcard-card.js"></script>
 <script type="module">
-import { resolveShareId, loadPostcard } from './src/postcardStorage.js';
+import { resolveShareId, loadPostcard, resolvePostcardStyle } from './src/postcardStorage.js';
 const viewPage = document.getElementById('viewPage');
 const viewStageWrap = document.getElementById('viewStageWrap');
 const viewStage = document.getElementById('viewStage');
@@ -298,14 +298,9 @@ async function initViewPage(){
     return;
   }
 
-  currentStyle = saved.style || 'modern';
+  currentStyle = resolvePostcardStyle(saved);
   cardData = saved.data;
 
-  const url = new URL(location.href);
-  if(currentStyle !== 'modern' && !url.searchParams.get('style')){
-    url.searchParams.set('style', currentStyle);
-    history.replaceState(null, '', url);
-  }
   FrameBackground.applyTheme(viewPage, currentStyle);
   document.documentElement.dataset.cardStyle = currentStyle;
 

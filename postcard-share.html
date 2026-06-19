@@ -65,6 +65,7 @@ import {
   syncShareIdInUrl,
   buildPostcardViewUrl,
   loadPostcard,
+  resolvePostcardStyle,
 } from './src/postcardStorage.js';
 const sharePage = document.getElementById('sharePage');
 const shareStageWrap = document.getElementById('shareStageWrap');
@@ -98,28 +99,12 @@ const ENVELOPE_SRC = {
   vintage: 'assets/welcome/vintage/envelope.png',
 };
 
-function cardStyleKey(raw){
-  if(!raw || raw === 'modern') return 'modern';
-  if(raw === 'retro' || raw === 'retro70') return 'retro70';
-  if(raw === 'vintage') return 'vintage';
-  return ENVELOPE_SRC[raw] ? raw : 'modern';
-}
-
-function resolveShareStyle(saved){
-  if(saved && saved.style) return saved.style;
-  const fromUrl = new URLSearchParams(window.location.search).get('style');
-  if(fromUrl) return fromUrl;
-  if(saved && saved.theme) return saved.theme;
-  return 'modern';
-}
-
-function applyShareTheme(rawStyle){
-  const raw = rawStyle || resolveShareStyle(null);
-  const cardStyle = cardStyleKey(raw);
-  FrameBackground.applyTheme(sharePage, raw);
-  document.documentElement.dataset.cardStyle = cardStyle;
+function applyShareTheme(cardStyle){
+  const style = cardStyle || 'modern';
+  FrameBackground.applyTheme(sharePage, style);
+  document.documentElement.dataset.cardStyle = style;
   if(shareEnvelope){
-    shareEnvelope.src = ENVELOPE_SRC[cardStyle] || ENVELOPE_SRC.modern;
+    shareEnvelope.src = ENVELOPE_SRC[style] || ENVELOPE_SRC.modern;
   }
   scheduleFit();
 }
@@ -192,10 +177,10 @@ async function loadCardPreview(shareId){
     console.error(err);
   }
 
-  applyShareTheme(resolveShareStyle(saved));
+  applyShareTheme(resolvePostcardStyle(saved));
 
   if(saved && saved.data){
-    await renderSavedCard(cardStyleKey(saved.style || saved.theme), saved.data);
+    await renderSavedCard(resolvePostcardStyle(saved), saved.data);
     return id;
   }
 
@@ -231,8 +216,7 @@ async function renderSavedCard(style, data){
 function setShareLink(shareId){
   const id = shareId || resolveShareId();
   if(!id) return;
-  const themeRaw = new URLSearchParams(window.location.search).get('style');
-  shareLinkText.textContent = buildPostcardViewUrl(id, { style: themeRaw });
+  shareLinkText.textContent = buildPostcardViewUrl(id);
 }
 
 function toggleCardFlip(){

@@ -2101,9 +2101,6 @@ btnFinish.addEventListener('click', async ()=>{
     const shareId = await savePostcard(payload, { photoBlob: pendingPhotoBlob });
     const shareUrl = new URL('/postcard-share.html', window.location.origin);
     shareUrl.searchParams.set('id', shareId);
-    if(currentStyle !== 'modern'){
-      shareUrl.searchParams.set('style', currentStyle);
-    }
     window.location.assign(shareUrl.href);
   } catch(err){
     console.error(err);
