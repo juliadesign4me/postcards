@@ -80,6 +80,25 @@ body{
   text-underline-offset:6px;
 }
 
+.welcome-h-br-d1,
+.welcome-h-br-d2,
+.welcome-h-desktop-line2{
+  display:none;
+}
+
+@media (min-width:901px){
+  .welcome-h-br-d1,
+  .welcome-h-br-d2,
+  .welcome-h-desktop-line2{
+    display:block;
+  }
+  .welcome-h-mobile-tail,
+  .welcome-h-br-m,
+  .welcome-h-mobile-own{
+    display:none;
+  }
+}
+
 .welcome-lead{
   font-family:Inter,system-ui,sans-serif;
   font-size:24px;
@@ -285,6 +304,32 @@ body{
   height:15px;
 }
 
+.preview-slider{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+}
+
+.preview-compose.is-slide-out-left{
+  animation:welcomeSlideOutLeft .6s cubic-bezier(.4,0,.2,1) forwards;
+  pointer-events:none;
+}
+
+.preview-compose.is-slide-in-right{
+  animation:welcomeSlideInRight .6s cubic-bezier(.4,0,.2,1) forwards;
+  pointer-events:none;
+}
+
+@keyframes welcomeSlideOutLeft{
+  from{transform:translateX(0);opacity:1;}
+  to{transform:translateX(-108%);opacity:0;}
+}
+
+@keyframes welcomeSlideInRight{
+  from{transform:translateX(108%);opacity:0;}
+  to{transform:translateX(0);opacity:1;}
+}
+
 @media (min-width:901px){
 .welcome-preview{
   position:absolute;
@@ -295,6 +340,7 @@ body{
   z-index:2;
   cursor:pointer;
   pointer-events:auto;
+  overflow:hidden;
 }
 
 .preview-compose{
@@ -347,11 +393,6 @@ body{
 .welcome-preview.is-flipped .welcome-card-front{
   transform:translate(64.68px,-102.75px) rotate(13.24deg);
   z-index:1;
-}
-
-.welcome-preview.is-switching .welcome-card-front,
-.welcome-preview.is-switching .welcome-card-back{
-  opacity:0;
 }
 
 .welcome-styles{
@@ -459,9 +500,6 @@ body{
     font-size:66px;
     line-height:60px;
   }
-  .welcome-heading-break--desktop{
-    display:none;
-  }
   .welcome-lead{
     font-size:20px;
     line-height:26px;
@@ -528,9 +566,15 @@ body{
     margin:50px auto 0;
     padding-bottom:0;
     flex-shrink:0;
-    overflow:visible;
+    overflow:hidden;
     cursor:pointer;
     pointer-events:auto;
+  }
+
+  .preview-slider{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
   }
 
   .preview-compose{
