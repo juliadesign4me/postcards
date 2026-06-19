@@ -1533,7 +1533,7 @@ body{
 <script type="module" src="assets/postcard-card.js"></script>
 
 <script type="module">
-import { savePostcard } from './src/postcardStorage.js';
+import { savePostcard, rememberPostcardId } from './src/postcardStorage.js';
 import { compressImageFile, validateImageFile } from './src/imageUpload.js';
 import { applyCreatePageAssets } from './assets/create-page-assets.js';
 
@@ -2099,12 +2099,13 @@ btnFinish.addEventListener('click', async ()=>{
       data: exportData(),
     };
     const id = await savePostcard(payload, { photoBlob: pendingPhotoBlob });
-    const shareUrl = new URL('postcard-share.html', window.location.href);
+    rememberPostcardId(id);
+    const shareUrl = new URL('/postcard-share.html', window.location.origin);
     shareUrl.searchParams.set('id', id);
     if(currentStyle !== 'modern'){
       shareUrl.searchParams.set('style', currentStyle);
     }
-    window.location.href = shareUrl.href;
+    window.location.assign(shareUrl.href);
   } catch(err){
     console.error(err);
     alert(err.message || 'Could not save postcard');

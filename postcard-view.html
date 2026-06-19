@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="assets/view.css">
 <link rel="stylesheet" href="assets/mobile-responsive.css">
 <script src="assets/frame-background.js"></script>
+<script src="assets/retro-filter.js"></script>
 </head>
 <body>
 <div class="view-sheet frame-sheet" id="viewSheet" aria-hidden="true">
@@ -63,10 +64,9 @@
   </div>
 </div>
 
-<script src="assets/retro-filter.js"></script>
 <script type="module" src="assets/postcard-card.js"></script>
 <script type="module">
-import { getPostcardIdFromUrl, loadPostcard } from './src/postcardStorage.js';
+import { resolvePostcardId, loadPostcard } from './src/postcardStorage.js';
 const viewPage = document.getElementById('viewPage');
 const viewStageWrap = document.getElementById('viewStageWrap');
 const viewStage = document.getElementById('viewStage');
@@ -198,8 +198,15 @@ function fitStage(){
   fitStampSheet();
 }
 
+function normalizePhotoUrl(photo){
+  if(!photo || typeof photo !== 'string') return null;
+  if(photo.startsWith('blob:')) return null;
+  return photo;
+}
+
 function mountCard(){
   const merged = Object.assign({}, PostcardCard.DEFAULT_DATA, cardData);
+  merged.photo = normalizePhotoUrl(merged.photo);
   cardFront.replaceChildren(PostcardCard.createElement(currentStyle, 'front', merged));
   cardBack.replaceChildren(PostcardCard.createElement(currentStyle, 'back', merged));
 }
@@ -275,7 +282,7 @@ function getPreviewExport(){
 async function initViewPage(){
   let saved = getPreviewExport();
   if(!saved){
-    const id = getPostcardIdFromUrl();
+    const id = resolvePostcardId();
     if(!id){
       window.location.replace('postcard-create.html');
       return;

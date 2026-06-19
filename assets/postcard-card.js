@@ -59,13 +59,22 @@ const PostcardCard = (() => {
 
   const BACK_STAMP_OPTIONS = CARD_ASSETS.backStamps;
 
+  function stampAssetName(src) {
+    if (!src) return '';
+    const path = String(src).split('?')[0];
+    return path.split('/').pop().toLowerCase();
+  }
+
   function stampNeedsPlate(src) {
-    if (!src) return false;
-    const path = src.split('?')[0];
-    const name = path.split('/').pop().toLowerCase();
-    if (name === 'stamp-2.png' || name === 'stamp-back-2.png') return true;
-    if (name === 'stamp-back-ghost.png' || name === 'stamp-front-ref.png') return true;
-    if (name === 'stamp-back.png' && path.includes('/modern/')) return true;
+    const name = stampAssetName(src);
+    if (!name) return false;
+    // Dev: stamp-2.png — production (Vite): stamp-2-D4uFi8hZ.png
+    if (/^stamp-2(-[a-z0-9]+)?\.png$/i.test(name)) return true;
+    if (/^stamp-back-1(-[a-z0-9]+)?\.png$/i.test(name)) return true;
+    if (/^stamp-back-2(-[a-z0-9]+)?\.png$/i.test(name)) return true;
+    if (/^stamp-back-ghost(-[a-z0-9]+)?\.png$/i.test(name)) return true;
+    if (/^stamp-front-ref(-[a-z0-9]+)?\.png$/i.test(name)) return true;
+    if (name === 'stamp-back.png' && String(src).includes('/modern/')) return true;
     return false;
   }
 
@@ -367,6 +376,18 @@ const PostcardCard = (() => {
 
   function mountFilteredPhoto(img, styleId, photoSrc) {
     if (!photoSrc) return;
+    img.decoding = 'async';
+    if (!photoSrc.startsWith('data:') && !photoSrc.startsWith('blob:')) {
+      img.referrerPolicy = 'no-referrer';
+    }
+    img.onerror = () => {
+      if (img.dataset.photoFallback === '1') return;
+      img.dataset.photoFallback = '1';
+      img.removeAttribute('crossorigin');
+      img.src = photoSrc;
+    };
+    // Show the photo immediately; optional filters may replace src afterward.
+    img.src = photoSrc;
     const ratio = photoForStyle(styleId).ratio;
     if (styleId === 'retro70' && warmFilterAvailable()) {
       RetroFilter.applyWarmToDataUrl(photoSrc, ratio)
@@ -375,7 +396,6 @@ const PostcardCard = (() => {
         })
         .catch((err) => {
           console.error('[PostcardCard] warm filter failed', err);
-          if (img.isConnected) img.src = photoSrc;
         });
       return;
     }
@@ -386,11 +406,8 @@ const PostcardCard = (() => {
         })
         .catch((err) => {
           console.error('[PostcardCard] vintage filter failed', err);
-          if (img.isConnected) img.src = photoSrc;
         });
-      return;
     }
-    img.src = photoSrc;
   }
 
   function appendVintageBg(root, assets) {

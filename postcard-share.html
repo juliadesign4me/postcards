@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="assets/share.css">
 <link rel="stylesheet" href="assets/mobile-responsive.css">
 <script src="assets/frame-background.js"></script>
+<script src="assets/retro-filter.js"></script>
 </head>
 <body>
 <div class="share-sheet frame-sheet" id="shareSheet" aria-hidden="true">
@@ -57,10 +58,14 @@
   </div>
 </div>
 
-<script src="assets/retro-filter.js"></script>
 <script type="module" src="assets/postcard-card.js"></script>
 <script type="module">
-import { getPostcardIdFromUrl, loadPostcard } from './src/postcardStorage.js';
+import {
+  resolvePostcardId,
+  syncPostcardIdInUrl,
+  buildPostcardViewUrl,
+  loadPostcard,
+} from './src/postcardStorage.js';
 const sharePage = document.getElementById('sharePage');
 const shareStageWrap = document.getElementById('shareStageWrap');
 const shareStage = document.getElementById('shareStage');
@@ -172,12 +177,13 @@ function fitStage(){
   fitStampSheet();
 }
 
-async function loadCardPreview(){
-  const id = getPostcardIdFromUrl();
+async function loadCardPreview(postcardId){
+  const id = postcardId || resolvePostcardId();
   if(!id){
     window.location.replace('postcard-create.html');
-    return;
+    return null;
   }
+  syncPostcardIdInUrl(id);
 
   let saved = null;
   try {
@@ -189,10 +195,12 @@ async function loadCardPreview(){
   applyShareTheme(resolveShareStyle(saved));
 
   if(saved && saved.data){
-    return renderSavedCard(cardStyleKey(saved.style || saved.theme), saved.data);
+    await renderSavedCard(cardStyleKey(saved.style || saved.theme), saved.data);
+    return id;
   }
 
   window.location.replace('postcard-create.html');
+  return null;
 }
 
 async function renderSavedCard(style, data){
@@ -220,16 +228,11 @@ async function renderSavedCard(style, data){
   }
 }
 
-function setShareLink(){
-  const id = getPostcardIdFromUrl();
+function setShareLink(postcardId){
+  const id = postcardId || resolvePostcardId();
   if(!id) return;
-  const url = new URL('postcard-view.html', window.location.href);
-  url.searchParams.set('id', id);
   const themeRaw = new URLSearchParams(window.location.search).get('style');
-  if(themeRaw && themeRaw !== 'modern'){
-    url.searchParams.set('style', themeRaw);
-  }
-  shareLinkText.textContent = url.href;
+  shareLinkText.textContent = buildPostcardViewUrl(id, { style: themeRaw });
 }
 
 function toggleCardFlip(){
@@ -280,8 +283,13 @@ function scheduleFit(){
 }
 
 async function initSharePage(){
-  await loadCardPreview();
-  setShareLink();
+  const postcardId = resolvePostcardId();
+  if(postcardId){
+    syncPostcardIdInUrl(postcardId);
+    setShareLink(postcardId);
+  }
+  await loadCardPreview(postcardId);
+  setShareLink(postcardId);
   scheduleFit();
 }
 

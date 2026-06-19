@@ -109,5 +109,5 @@ export async function resolvePhotoForStorage(photoValue, photoBlob){
     }
     return uploadPhotoBlob(await response.blob());
   }
-  return photoValue;
+  throw new Error('Фото потрібно завантажити перед збереженням.');
 }
