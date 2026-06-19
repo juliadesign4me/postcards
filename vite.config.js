@@ -10,18 +10,27 @@ const LEGACY_SCRIPT_NAMES = [
   'immersive',
 ];
 
-function copyLegacyScripts(){
+function copyStaticAssets(){
   return {
-    name: 'copy-legacy-scripts',
+    name: 'copy-static-assets',
     closeBundle(){
       const outDir = resolve(__dirname, 'dist/assets');
       mkdirSync(outDir, { recursive: true });
+
       for(const name of LEGACY_SCRIPT_NAMES){
         cpSync(
           resolve(__dirname, `assets/${name}.js`),
           resolve(outDir, `${name}.js`),
         );
       }
+
+      // Welcome preview images are referenced as plain paths in HTML/inline JS
+      // (style switch), not as ES imports — copy them verbatim into dist.
+      cpSync(
+        resolve(__dirname, 'assets/welcome'),
+        resolve(outDir, 'welcome'),
+        { recursive: true },
+      );
     },
   };
 }
@@ -29,7 +38,7 @@ function copyLegacyScripts(){
 export default defineConfig({
   root: '.',
   envDir: '.',
-  plugins: [copyLegacyScripts()],
+  plugins: [copyStaticAssets()],
   build: {
     rollupOptions: {
       input: {
