@@ -1534,7 +1534,7 @@ body{
 
 <script type="module">
 import { savePostcard } from './src/postcardStorage.js';
-import { compressImageFile, validateImageFile } from './src/imageUpload.js';
+import { compressImageFile } from './src/imageUpload.js';
 import { applyCreatePageAssets } from './assets/create-page-assets.js';
 
 applyCreatePageAssets();
@@ -2117,7 +2117,6 @@ fileInput.addEventListener('change', async ()=>{
   fileInput.value = '';
   if(!file) return;
   try {
-    validateImageFile(file);
     const blob = await compressImageFile(file);
     setPhotoPreview(blob);
     mountPreview();
