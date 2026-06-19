@@ -151,19 +151,6 @@ body{
   transform-style:flat;
 }
 
-/* Vintage view: full-bleed photo without inner frame overlay. */
-.view-card-stamp .postcard-card--vintage.postcard-card--front .pc-photo{
-  left:0;
-  top:0;
-  width:100%;
-  height:100%;
-  border-radius:0;
-}
-
-.view-card-stamp .postcard-card--vintage.postcard-card--front .pc-vintage-inner-frame{
-  display:none;
-}
-
 .view-card-flip.is-flipping.show-front .view-card-face--front,
 .view-card-flip:not(.is-flipped):not(.is-flipping) .view-card-face--front{
   opacity:1;
