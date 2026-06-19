@@ -102,9 +102,6 @@ const frameBg = FrameBackground.create({
 const { DESIGN_W, DESIGN_H } = FrameBackground;
 const CARD_W = 826;
 const CARD_H = 572;
-const MOB_STAMP_AR = 291 / 420;
-const STAMP_INNER_W = 0.91905;
-const STAMP_INNER_H = 0.88659;
 const FLIP_MS = 650;
 const FLIP_EASE = 'cubic-bezier(.4,0,.2,1)';
 
@@ -133,12 +130,10 @@ function fitCardScale(){
       stamp.style.width = '';
       stamp.style.height = '';
     }
-    const stampW = stamp?.getBoundingClientRect().width
+    const slotW = viewCardSlot?.getBoundingClientRect().width
+      || stamp?.getBoundingClientRect().width
       || Math.min(window.innerWidth - 64, 376);
-    const stampH = stampW * MOB_STAMP_AR;
-    const innerW = stampW * STAMP_INNER_W;
-    const innerH = stampH * STAMP_INNER_H;
-    const scale = Math.min(innerW / CARD_W, innerH / CARD_H);
+    const scale = slotW / CARD_W;
     scaleTarget.style.setProperty('--view-scale', String(scale));
     cardFlip.style.setProperty('--view-scale', '1');
     cardFlip.style.width = CARD_W + 'px';
@@ -284,12 +279,10 @@ function hideViewCardPlaceholder(){
 
 function revealViewCard(){
   hideViewCardPlaceholder();
-  cardFront.replaceChildren();
-  cardBack.replaceChildren();
   mountCard();
   if(viewCardStamp){
     viewCardStamp.hidden = false;
-    viewCardStamp.style.display = '';
+    viewCardStamp.removeAttribute('hidden');
   }
   viewPage.classList.remove('is-loading');
   viewPageReady = true;

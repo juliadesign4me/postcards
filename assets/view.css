@@ -138,6 +138,35 @@ body{
   inset:0;
 }
 
+/* Show one card face at a time — opacity alone lets the back frame bleed through. */
+.view-card-flip:not(.is-flipped):not(.is-flipping) .view-card-face--back{
+  display:none !important;
+}
+
+.view-card-flip.is-flipped:not(.is-flipping) .view-card-face--front{
+  display:none !important;
+}
+
+.view-card-flip{
+  transform-style:flat;
+}
+
+.view-card-stamp .postcard-card .pc-frame{
+  display:none;
+}
+
+.view-card-stamp .postcard-card--front .pc-photo{
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  border-radius:0;
+}
+
+.view-card-stamp .postcard-card--front .pc-vintage-inner-frame{
+  display:none;
+}
+
 .view-card-flip.is-flipping.show-front .view-card-face--front,
 .view-card-flip:not(.is-flipped):not(.is-flipping) .view-card-face--front{
   opacity:1;
@@ -272,15 +301,12 @@ body{
   .view-page.is-loading .view-card-placeholder{
     display:block;
     width:100%;
-    aspect-ratio:420 / 291;
+    aspect-ratio:826 / 572;
     flex-shrink:0;
   }
 
   .view-card-placeholder-frame{
-    display:block;
-    width:100%;
-    height:100%;
-    object-fit:contain;
+    display:none;
   }
 
   .view-card-stamp{
@@ -289,7 +315,7 @@ body{
     top:auto;
     width:100%;
     max-width:var(--content-max, 376px);
-    aspect-ratio:420 / 291;
+    aspect-ratio:826 / 572;
     height:auto;
     margin:0;
     flex-shrink:0;
@@ -350,22 +376,16 @@ body{
   }
 
   .view-card-stamp-frame{
-    display:block;
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    pointer-events:none;
-    z-index:0;
+    display:none;
   }
 
   .view-card-stamp .view-card-wrap{
     position:absolute;
-    left:4.048%;
-    top:5.498%;
-    width:91.905%;
-    height:88.659%;
-    perspective:1200px;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    perspective:none;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -373,16 +393,17 @@ body{
     z-index:1;
   }
 
-  .view-card-stamp .postcard-card .pc-frame{
-    display:none;
+  .view-card-flip{
+    position:relative;
+    width:826px;
+    height:572px;
+    transform-origin:center center;
+    transform:rotateY(0deg);
   }
 
-  .view-card-stamp .postcard-card--front .pc-photo{
-    left:0;
-    top:0;
-    width:100%;
-    height:100%;
-    border-radius:0;
+  .view-card-face{
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
   }
 
   .view-card-scale{
@@ -392,14 +413,6 @@ body{
     flex:0 0 auto;
     transform:scale(var(--view-scale, 1));
     transform-origin:center center;
-  }
-
-  .view-card-flip{
-    position:relative;
-    width:826px;
-    height:572px;
-    transform-origin:center center;
-    transform:rotateY(0deg);
   }
 
   .view-flip-btn{
