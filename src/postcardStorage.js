@@ -65,24 +65,12 @@ export async function savePostcard(content, { photoBlob } = {}){
   const { data: shareId, error } = await supabase.rpc('create_postcard', {
     p_content: payload,
   });
-  if(!error && isShareId(shareId)){
-    rememberShareId(shareId);
-    return shareId;
-  }
-  if(error?.code !== 'PGRST202'){
-    throw error ?? new Error('Postcard was saved but Supabase did not return share_id.');
-  }
-  const { data: inserted, error: insertError } = await supabase
-    .from('postcards')
-    .insert({ content: payload })
-    .select('share_id')
-    .single();
-  if(insertError) throw insertError;
-  if(!isShareId(inserted?.share_id)){
+  if(error) throw error;
+  if(!isShareId(shareId)){
     throw new Error('Postcard was saved but Supabase did not return share_id.');
   }
-  rememberShareId(inserted.share_id);
-  return inserted.share_id;
+  rememberShareId(shareId);
+  return shareId;
 }
 
 export async function loadPostcard(shareId){
@@ -92,15 +80,8 @@ export async function loadPostcard(shareId){
   const { data, error } = await supabase.rpc('get_postcard_by_share_id', {
     p_share_id: shareId,
   });
-  if(!error) return data ?? null;
-  if(error.code !== 'PGRST202') throw error;
-  const { data: row, error: selectError } = await supabase
-    .from('postcards')
-    .select('content')
-    .eq('share_id', shareId)
-    .maybeSingle();
-  if(selectError) throw selectError;
-  return row?.content ?? null;
+  if(error) throw error;
+  return data ?? null;
 }
 
 // Backward-compatible aliases (URL param is still ?id=, value is share_id).
