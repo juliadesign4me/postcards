@@ -96,7 +96,10 @@
   }
 
   .welcome-styles {
-    display: none !important;
+    margin-top: 16px !important;
+    gap: 16px !important;
+    width: calc(100vw - 32px) !important;
+    max-width: 343px !important;
   }
 
   .welcome-style {
@@ -307,6 +310,7 @@
   .welcome-waitlist,
   .welcome-waitlist-success,
   .welcome-credit,
+  .welcome-styles,
   .share-heading,
   .share-panel {
     width: min(var(--content-max, 376px), 100%);

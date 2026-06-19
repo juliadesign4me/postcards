@@ -293,7 +293,8 @@ body{
   width:572px;
   height:563px;
   z-index:2;
-  pointer-events:none;
+  cursor:pointer;
+  pointer-events:auto;
 }
 
 .preview-compose{
@@ -458,6 +459,9 @@ body{
     font-size:66px;
     line-height:60px;
   }
+  .welcome-heading-break--desktop{
+    display:none;
+  }
   .welcome-lead{
     font-size:20px;
     line-height:26px;
@@ -525,6 +529,8 @@ body{
     padding-bottom:0;
     flex-shrink:0;
     overflow:visible;
+    cursor:pointer;
+    pointer-events:auto;
   }
 
   .preview-compose{
@@ -584,7 +590,19 @@ body{
     z-index:1;
   }
   .welcome-styles{
-    display:none;
+    position:relative;
+    left:auto;
+    top:auto;
+    order:3;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:nowrap;
+    gap:var(--shell-gap-lg, 24px);
+    margin:24px auto 0;
+    padding-bottom:0;
+    flex-shrink:0;
+    pointer-events:auto;
   }
   .welcome-style{
     font-size:18px;
