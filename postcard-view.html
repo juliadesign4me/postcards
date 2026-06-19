@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You've got a postcard!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&family=Great+Vibes&family=Homemade+Apple&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=Rye&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/frame-background.css">
+<link rel="stylesheet" href="assets/postcard-card.css">
+<link rel="stylesheet" href="assets/view.css">
+<link rel="stylesheet" href="assets/mobile-responsive.css">
+<script src="assets/frame-background.js"></script>
+</head>
+<body>
+<div class="view-sheet frame-sheet" id="viewSheet" aria-hidden="true">
+  <svg class="view-stamp frame-stamp" id="viewStamp" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none" overflow="visible">
+    <defs>
+      <mask id="stampMask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+        <rect id="stampMaskFill" fill="#fff"/>
+        <g id="stampHoleCircles" fill="#000"/>
+      </mask>
+    </defs>
+    <rect id="stampFill" mask="url(#stampMask)"/>
+  </svg>
+</div>
+
+<div class="view-page frame-page is-loading" id="viewPage">
+  <div class="view-stage-wrap" id="viewStageWrap">
+  <div class="view-stage" id="viewStage">
+
+    <h1 class="view-heading">you've got a <em>postcard!</em></h1>
+
+    <div class="view-card-stamp" id="viewCardStamp">
+      <img class="view-card-stamp-frame" src="assets/view/stamp-frame-mobile.svg" alt="" aria-hidden="true">
+      <div class="view-card-wrap" id="viewCardWrap" role="button" tabindex="0" aria-label="Flip postcard">
+        <div class="view-card-scale" id="viewCardScale">
+          <div class="view-card-flip" id="cardFlip">
+            <div class="view-card-face view-card-face--front" id="cardFront"></div>
+            <div class="view-card-face view-card-face--back" id="cardBack"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="view-flip-btn" id="btnFlip">
+      <img src="assets/postcards/create/icon-flip.svg" alt="">
+      <span>flip the card</span>
+    </button>
+
+    <div class="view-actions">
+      <a class="view-cta" href="postcard-create.html" id="viewCta">
+        <span class="view-cta-icon" aria-hidden="true">
+          <img src="assets/view/icon-post-stamp-outer.svg" alt="">
+          <img src="assets/view/icon-post-stamp-inner.svg" alt="">
+        </span>
+        <span>create your postcard</span>
+      </a>
+    </div>
+
+  </div>
+  </div>
+</div>
+
+<script src="assets/retro-filter.js"></script>
+<script type="module" src="assets/postcard-card.js"></script>
+<script type="module">
+import { getPostcardIdFromUrl, loadPostcard } from './src/postcardStorage.js';
+const viewPage = document.getElementById('viewPage');
+const viewStageWrap = document.getElementById('viewStageWrap');
+const viewStage = document.getElementById('viewStage');
+const viewSheet = document.getElementById('viewSheet');
+const viewStamp = document.getElementById('viewStamp');
+const stampFill = document.getElementById('stampFill');
+const stampMask = document.getElementById('stampMask');
+const stampMaskFill = document.getElementById('stampMaskFill');
+const stampHoleCircles = document.getElementById('stampHoleCircles');
+const cardFlip = document.getElementById('cardFlip');
+const cardFront = document.getElementById('cardFront');
+const cardBack = document.getElementById('cardBack');
+const btnFlip = document.getElementById('btnFlip');
+const viewCardWrap = document.getElementById('viewCardWrap');
+const viewCta = document.getElementById('viewCta');
+
+const frameBg = FrameBackground.create({
+  sheet: viewSheet,
+  stamp: viewStamp,
+  stampFill,
+  stampMask,
+  stampMaskFill,
+  stampHoleCircles,
+});
+
+const { DESIGN_W, DESIGN_H } = FrameBackground;
+const CARD_W = 826;
+const CARD_H = 572;
+const MOB_STAMP_AR = 291 / 420;
+const STAMP_INNER_W = 0.91905;
+const STAMP_INNER_H = 0.88659;
+const FLIP_MS = 650;
+const FLIP_EASE = 'cubic-bezier(.4,0,.2,1)';
+
+let currentStyle = 'modern';
+let cardData = null;
+let showingBack = false;
+
+function getViewInset(){
+  return frameBg.getInset();
+}
+
+function fitStampSheet(){
+  frameBg.fitStampSheet();
+}
+
+function fitCardScale(){
+  const mobile = window.matchMedia('(max-width:900px)').matches;
+  const stamp = document.getElementById('viewCardStamp');
+  const scaleEl = document.getElementById('viewCardScale');
+  const scaleTarget = mobile ? scaleEl : cardFlip;
+  if(mobile){
+    if(stamp){
+      stamp.style.width = '';
+      stamp.style.height = '';
+    }
+    const stampW = stamp?.getBoundingClientRect().width
+      || Math.min(window.innerWidth - 64, 376);
+    const stampH = stampW * MOB_STAMP_AR;
+    const innerW = stampW * STAMP_INNER_W;
+    const innerH = stampH * STAMP_INNER_H;
+    const scale = Math.min(innerW / CARD_W, innerH / CARD_H);
+    scaleTarget.style.setProperty('--view-scale', String(scale));
+    cardFlip.style.setProperty('--view-scale', '1');
+    cardFlip.style.width = CARD_W + 'px';
+    cardFlip.style.height = CARD_H + 'px';
+    if(scaleEl){
+      scaleEl.style.width = CARD_W + 'px';
+      scaleEl.style.height = CARD_H + 'px';
+    }
+    return;
+  }
+  cardFlip.style.setProperty('--view-scale', '1');
+  cardFlip.style.width = '';
+  cardFlip.style.height = '';
+  if(scaleEl){
+    scaleEl.style.setProperty('--view-scale', '1');
+    scaleEl.style.width = CARD_W + 'px';
+    scaleEl.style.height = CARD_H + 'px';
+  }
+  if(stamp){
+    stamp.style.width = '';
+    stamp.style.height = '';
+  }
+  const wrap = document.querySelector('.view-card-wrap');
+  if(wrap){
+    wrap.style.width = CARD_W + 'px';
+    wrap.style.height = CARD_H + 'px';
+  }
+}
+
+function fitStage(){
+  const mobile = window.matchMedia('(max-width:900px)').matches;
+  viewStage.style.transform = '';
+  viewStage.style.width = '';
+  viewStage.style.height = '';
+  viewStage.style.margin = '';
+  viewStage.style.transformOrigin = '';
+  viewPage.style.overflow = mobile ? 'hidden' : '';
+  if(viewStageWrap){
+    viewStageWrap.style.width = '';
+    viewStageWrap.style.height = '';
+    viewStageWrap.style.overflow = '';
+  }
+  fitCardScale();
+  if(mobile){
+    fitStampSheet();
+    return;
+  }
+  const inset = getViewInset();
+  const vpW = window.innerWidth;
+  const vpH = window.innerHeight;
+  const availW = vpW - inset * 2;
+  const availH = vpH - inset * 2;
+  const scale = Math.min(availW / DESIGN_W, availH / DESIGN_H, 1);
+  viewPage.style.overflow = scale < 1 ? 'auto' : 'hidden';
+  if(scale < 1){
+    viewStage.style.transform = `scale(${scale})`;
+    viewStage.style.transformOrigin = 'top left';
+    viewStage.style.width = `${DESIGN_W}px`;
+    viewStage.style.height = `${DESIGN_H}px`;
+    viewStage.style.margin = '0';
+    if(viewStageWrap){
+      viewStageWrap.style.width = `${Math.ceil(DESIGN_W * scale)}px`;
+      viewStageWrap.style.height = `${Math.ceil(DESIGN_H * scale)}px`;
+      viewStageWrap.style.overflow = 'hidden';
+    }
+  }
+  fitStampSheet();
+}
+
+function mountCard(){
+  const merged = Object.assign({}, PostcardCard.DEFAULT_DATA, cardData);
+  cardFront.replaceChildren(PostcardCard.createElement(currentStyle, 'front', merged));
+  cardBack.replaceChildren(PostcardCard.createElement(currentStyle, 'back', merged));
+}
+
+function getCardScale(){
+  const mobile = window.matchMedia('(max-width:900px)').matches;
+  const scaleTarget = mobile ? document.getElementById('viewCardScale') : cardFlip;
+  return getComputedStyle(scaleTarget).getPropertyValue('--view-scale').trim() || '1';
+}
+
+function runFlipAnimation(toBack){
+  const mobile = window.matchMedia('(max-width:900px)').matches;
+  const scale = mobile ? 1 : getCardScale();
+  const half = FLIP_MS / 2;
+  cardFlip.classList.add('is-flipping', toBack ? 'show-front' : 'show-back');
+  cardFlip.classList.toggle('is-flipped', !toBack);
+
+  cardFlip.style.transition = 'transform ' + half + 'ms ' + FLIP_EASE;
+  cardFlip.style.transform = (mobile ? '' : 'scale(' + scale + ') ') + 'rotateY(' + (toBack ? 90 : -90) + 'deg)';
+
+  window.setTimeout(() => {
+    cardFlip.classList.toggle('is-flipped', toBack);
+    cardFlip.classList.remove('show-front', 'show-back');
+    cardFlip.classList.add(toBack ? 'show-back' : 'show-front');
+    cardFlip.style.transition = 'none';
+    cardFlip.style.transform = (mobile ? '' : 'scale(' + scale + ') ') + 'rotateY(' + (toBack ? -90 : 90) + 'deg)';
+
+    requestAnimationFrame(() => {
+      cardFlip.style.transition = 'transform ' + half + 'ms ' + FLIP_EASE;
+      cardFlip.style.transform = (mobile ? '' : 'scale(' + scale + ') ') + 'rotateY(0deg)';
+
+      window.setTimeout(() => {
+        cardFlip.classList.remove('is-flipping', 'show-front', 'show-back');
+        cardFlip.style.transition = '';
+        cardFlip.style.transform = mobile ? '' : '';
+      }, half);
+    });
+  }, half);
+}
+
+function toggleViewFlip(){
+  if(cardFlip.classList.contains('is-flipping')) return;
+  showingBack = !showingBack;
+  runFlipAnimation(showingBack);
+}
+
+if(viewCardWrap){
+  viewCardWrap.addEventListener('click', toggleViewFlip);
+  viewCardWrap.addEventListener('keydown', (e)=>{
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    toggleViewFlip();
+  });
+}
+
+btnFlip.addEventListener('click', toggleViewFlip);
+
+function getPreviewExport(){
+  if(!new URLSearchParams(window.location.search).has('preview')) return null;
+  return {
+    style: 'modern',
+    data: {
+      titleLine1: 'Postcard',
+      titleLine2: 'Vacation',
+      from: 'Julia',
+      to: 'You',
+      message: 'Wish you were here!',
+      photo: null,
+    },
+  };
+}
+
+async function initViewPage(){
+  let saved = getPreviewExport();
+  if(!saved){
+    const id = getPostcardIdFromUrl();
+    if(!id){
+      window.location.replace('postcard-create.html');
+      return;
+    }
+    try {
+      saved = await loadPostcard(id);
+    } catch(err){
+      console.error(err);
+    }
+  }
+  if(!saved || !saved.data){
+    window.location.replace('postcard-create.html');
+    return;
+  }
+
+  currentStyle = saved.style || 'modern';
+  cardData = saved.data;
+
+  const url = new URL(location.href);
+  if(currentStyle !== 'modern' && !url.searchParams.get('style')){
+    url.searchParams.set('style', currentStyle);
+    history.replaceState(null, '', url);
+  }
+  FrameBackground.applyTheme(viewPage, currentStyle);
+  document.documentElement.dataset.cardStyle = currentStyle;
+
+  if(document.fonts && document.fonts.ready){
+    await document.fonts.ready;
+  }
+
+  mountCard();
+  viewPage.classList.remove('is-loading');
+  if(viewCta){
+    const ctaUrl = new URL('postcard-create.html', location.href);
+    if(currentStyle !== 'modern'){
+      ctaUrl.searchParams.set('style', currentStyle);
+    }
+    viewCta.href = ctaUrl.href;
+  }
+  scheduleFit();
+}
+
+function scheduleFit(){
+  fitStage();
+  requestAnimationFrame(fitStage);
+}
+
+initViewPage();
+window.addEventListener('resize', scheduleFit);
+window.addEventListener('orientationchange', scheduleFit);
+window.addEventListener('load', scheduleFit);
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', scheduleFit);
+}
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(scheduleFit);
+}
+</script>
+</body>
+</html>

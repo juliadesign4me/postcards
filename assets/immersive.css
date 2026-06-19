@@ -1,0 +1,150 @@
+/* Late 1930s / early 1940s photo booth atmosphere */
+
+#ambient-layer{
+  position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden;
+}
+#ambient-vignette{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 78% 68% at 50% 42%, transparent 18%, rgba(22,14,8,0.45) 62%, rgba(6,3,1,0.82) 100%),
+    linear-gradient(180deg, rgba(8,5,3,0.35) 0%, transparent 28%, transparent 72%, rgba(10,6,3,0.5) 100%);
+}
+#ambient-warmth{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 55% 48% at 52% 40%, rgba(232,168,85,0.1) 0%, rgba(180,110,50,0.03) 45%, transparent 70%);
+  animation:ambientWarmthPulse 7s ease-in-out infinite alternate;
+}
+#ambient-flicker{
+  position:absolute;inset:0;
+  background:rgba(255,220,160,0);
+  animation:bulbFlicker 14s linear infinite;
+}
+@keyframes ambientWarmthPulse{
+  0%{opacity:0.65;}
+  100%{opacity:1;}
+}
+@keyframes bulbFlicker{
+  0%,100%{opacity:0;}
+  47%{opacity:0;}
+  47.4%{opacity:0.05;}
+  47.8%{opacity:0;}
+  71%{opacity:0;}
+  71.25%{opacity:0.07;}
+  71.5%{opacity:0.015;}
+  72%{opacity:0;}
+}
+
+/* Dimensional booth chrome — cast enamel + depth */
+.booth-depth{
+  filter:
+    drop-shadow(0 32px 56px rgba(0,0,0,0.58))
+    drop-shadow(0 10px 20px rgba(28,16,8,0.42))
+    drop-shadow(-6px 0 18px rgba(0,0,0,0.18));
+}
+.booth-depth img{display:block;}
+
+#booth-bg{
+  transition:transform 0.12s ease-out;
+  will-change:transform;
+}
+#booth-bg::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 55% at 50% 55%, transparent 30%, rgba(12,8,4,0.25) 100%);
+}
+
+/* Viewfinder — velvet curtain booth interior */
+#viewfinder-vignette{
+  position:absolute;inset:0;pointer-events:none;z-index:4;border-radius:inherit;
+  background:
+    radial-gradient(ellipse 92% 90% at 50% 46%, transparent 32%, rgba(14,7,3,0.55) 72%, rgba(3,1,0,0.9) 100%),
+    linear-gradient(180deg, rgba(0,0,0,0.18) 0%, transparent 12%, transparent 88%, rgba(0,0,0,0.22) 100%);
+}
+#viewfinder-warmth{
+  position:absolute;inset:0;pointer-events:none;z-index:3;border-radius:inherit;
+  background:radial-gradient(ellipse 68% 58% at 50% 38%, rgba(255,196,110,0.14) 0%, transparent 68%);
+  mix-blend-mode:soft-light;
+}
+#preview-curtain{
+  position:absolute;left:0;right:0;top:0;height:52%;pointer-events:none;z-index:6;border-radius:inherit 0 0 0;
+  background:
+    linear-gradient(180deg, #3a1810 0%, #4a2218 38%, #3a1810 72%, rgba(58,24,16,0.92) 100%),
+    repeating-linear-gradient(90deg, transparent 0, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 6px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.55), inset 0 -12px 20px rgba(0,0,0,0.35);
+  transform:translateY(-108%);
+  transition:transform 0.9s cubic-bezier(0.45,0.05,0.2,1);
+}
+#preview-wrap.curtains-closed #preview-curtain{transform:translateY(0);}
+#preview-wrap.curtains-open #preview-curtain{transform:translateY(-108%);}
+#preview-wrap.idle-glow #viewfinder-warmth{animation:tungstenIdle 3.8s ease-in-out infinite alternate;}
+
+#preview{
+  filter:sepia(0.14) contrast(1.06) brightness(0.94) saturate(0.86);
+}
+
+@keyframes tungstenIdle{
+  0%{opacity:0.6;}
+  100%{opacity:1;}
+}
+
+/* Orthochromatic flash bulb */
+.flash-overlay{
+  position:absolute;inset:0;z-index:30;pointer-events:none;
+  background:#fff;opacity:0;border-radius:inherit;
+}
+.flash-overlay.active{animation:orthoFlash 0.38s ease-out forwards;}
+@keyframes orthoFlash{
+  0%{opacity:0;background:#f5f2ea;}
+  12%{opacity:1;background:#fff;}
+  35%{opacity:0.85;background:#e6edf5;}
+  100%{opacity:0;}
+}
+
+.shutter-shake{animation:shutterShake 0.3s ease-out;}
+@keyframes shutterShake{
+  0%,100%{transform:translate(0,0);}
+  18%{transform:translate(-2px,1px);}
+  36%{transform:translate(2px,-1px);}
+  54%{transform:translate(-1px,-2px);}
+  72%{transform:translate(1px,1px);}
+}
+
+/* Result page — strip emerging from mechanical slot */
+#slot-glow{
+  position:absolute;left:50%;top:36%;width:140px;height:28px;
+  transform:translateX(-50%);
+  background:radial-gradient(ellipse, rgba(255,205,120,0.75) 0%, rgba(255,155,55,0.3) 42%, transparent 72%);
+  opacity:0;pointer-events:none;z-index:4;
+  filter:blur(5px);
+}
+#slot-glow.printing{animation:slotGlow 1.2s ease-in-out forwards;}
+@keyframes slotGlow{
+  0%{opacity:0;}
+  12%{opacity:0.95;}
+  55%{opacity:0.7;}
+  100%{opacity:0.12;}
+}
+
+#strip{
+  filter:drop-shadow(0 14px 28px rgba(0,0,0,0.48));
+  transition:filter 0.35s ease;
+}
+#strip.printing{filter:drop-shadow(0 8px 16px rgba(0,0,0,0.38));}
+
+#dispenser.booth-depth{transition:transform 0.12s ease-out;will-change:transform;}
+
+/* Landing page — booth as physical object in the room */
+.hero-depth{
+  filter:drop-shadow(0 28px 48px rgba(0,0,0,0.52)) drop-shadow(0 6px 14px rgba(20,12,6,0.35));
+  transition:transform 0.12s ease-out;
+  will-change:transform;
+}
+.hero-depth::after{
+  content:'';position:absolute;inset:-6%;pointer-events:none;z-index:3;
+  background:radial-gradient(ellipse 82% 72% at 50% 38%, transparent 48%, rgba(18,10,5,0.32) 100%);
+}
+
+@media (prefers-reduced-motion: reduce){
+  #ambient-warmth,#ambient-flicker,#preview-wrap.idle-glow #viewfinder-warmth{animation:none;}
+  #preview-curtain{transition-duration:0.01ms;}
+  .shutter-shake{animation:none;}
+}

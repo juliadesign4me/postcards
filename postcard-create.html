@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Postcard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&family=Great+Vibes&family=Homemade+Apple&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=Rye&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/page-theme.css">
+<link rel="stylesheet" href="assets/mobile-responsive.css">
+<script src="assets/page-theme.js"></script>
+<style id="postcard-card">
+@import url('https://fonts.googleapis.com/css2?family=Cabin+Sketch&family=Great+Vibes&family=Rye&display=swap');
+
+/* Postcard card — shared layout (826×572 design canvas) */
+.postcard-card{
+  position:relative;
+  width:826px;
+  height:572px;
+  flex:0 0 auto;
+  overflow:hidden;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+.postcard-card img{
+  display:block;
+  pointer-events:none;
+}
+
+/* Photo slot — 762×508 @ (32, 32) */
+.pc-photo{
+  position:absolute;
+  left:32px;
+  top:32px;
+  width:762px;
+  height:508px;
+  border-radius:12px;
+  overflow:hidden;
+  z-index:3;
+}
+.pc-photo img,
+.pc-photo canvas{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.pc-photo--empty{
+  background:#d4d4d4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.pc-upload-cta{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  opacity:.4;
+}
+.pc-upload-cta img{width:44px;height:44px;}
+.pc-upload-cta span{
+  font-family:Inter,system-ui,sans-serif;
+  font-weight:500;
+  font-size:18px;
+  line-height:18px;
+  color:#000;
+}
+
+/* Generic gray placeholder slot */
+.pc-slot-gray{
+  background:#d4d4d4;
+}
+
+/* Frame overlay — border ring under content */
+.pc-frame{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* Title hint — per line */
+.pc-line-hint{opacity:.3;}
+
+/* ===== Modern — Front ===== */
+.postcard-card--modern.postcard-card--front .pc-front-title,
+.postcard-card--modern.postcard-card--front .pc-front-title .pc-underline{
+  font-family:'Cabin Sketch',cursive;
+  font-weight:400;
+}
+.postcard-card--modern.postcard-card--front .pc-front-title{
+  position:absolute;
+  left:80px;
+  top:360px;
+  z-index:5;
+  font-size:66px;
+  line-height:66px;
+  color:#000;
+  white-space:normal;
+}
+.postcard-card--modern.postcard-card--front .pc-front-title .pc-underline{
+  text-decoration:underline;
+  text-decoration-thickness:2px;
+  text-underline-offset:4px;
+}
+
+/* Stamp slot — reserved, empty by default */
+.postcard-card--modern .pc-stamp-slot--front{
+  position:absolute;
+  left:627px;
+  top:62px;
+  width:137px;
+  height:140px;
+  z-index:4;
+}
+.postcard-card--modern .pc-stamp-slot--front img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+/* ===== Modern — Back ===== */
+.postcard-card--modern.postcard-card--back{
+  background:transparent;
+}
+.postcard-card--modern.postcard-card--back .pc-back-inner{
+  position:absolute;
+  left:32px;
+  top:32px;
+  width:762px;
+  height:508px;
+  border:1.4px dashed rgba(255,255,255,.2);
+  z-index:3;
+  --pc-rule-width:236px;
+  --pc-message-rule-width:346px;
+}
+.postcard-card--modern .pc-back-divider{
+  position:absolute;
+  left:326px;
+  top:73px;
+  width:1.4px;
+  height:362px;
+  background:rgba(255,255,255,.35);
+}
+.postcard-card--modern .pc-back-title,
+.postcard-card--modern .pc-back-title .pc-underline{
+  font-family:'Cabin Sketch',cursive;
+  font-weight:400;
+}
+.postcard-card--modern .pc-back-title{
+  position:absolute;
+  left:48px;
+  top:48px;
+  font-size:36px;
+  line-height:38px;
+  color:#fff;
+  white-space:nowrap;
+}
+.postcard-card--modern .pc-back-title .pc-underline{
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+
+.postcard-card--modern .pc-stickers{
+  position:absolute;
+  left:48px;
+  top:216px;
+  display:grid;
+  grid-template-columns:96px 96px;
+  grid-template-rows:96px 96px;
+  gap:20px;
+}
+.postcard-card--modern .pc-sticker-slot{
+  width:96px;
+  height:96px;
+}
+.postcard-card--modern .pc-sticker-slot--empty{
+  border:1.4px dashed rgba(255,255,255,.2);
+  background:transparent;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.postcard-card--modern .pc-sticker-slot--empty .pc-slot-upload{
+  width:24px;
+  height:24px;
+  opacity:.4;
+  pointer-events:none;
+}
+.postcard-card--modern .pc-sticker-slot img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.postcard-card--modern .pc-address{
+  position:absolute;
+  left:386px;
+  top:121px;
+  width:346px;
+}
+.postcard-card--modern .pc-field{
+  position:relative;
+  height:48px;
+  margin-bottom:0;
+}
+.postcard-card--modern .pc-field label{
+  font-family:Inter,system-ui,sans-serif;
+  font-size:20px;
+  line-height:30px;
+  color:#fff;
+}
+.postcard-card--modern .pc-field .pc-handwriting{
+  position:absolute;
+  left:74px;
+  top:0;
+  font-family:'Homemade Apple',cursive;
+  font-size:20px;
+  line-height:30px;
+  color:#fff;
+  white-space:nowrap;
+  min-width:1px;
+  min-height:30px;
+}
+.postcard-card--modern .pc-field .pc-line{
+  position:absolute;
+  left:0;
+  top:28px;
+  width:var(--pc-rule-width, 236px);
+  height:1.4px;
+  background:rgba(255,255,255,.35);
+}
+
+.postcard-card--modern .pc-message-lines{
+  position:absolute;
+  left:386px;
+  top:268px;
+  width:var(--pc-message-rule-width, 346px);
+  display:flex;
+  flex-direction:column;
+  gap:38.6px;
+  z-index:1;
+  pointer-events:none;
+}
+.postcard-card--modern .pc-message-lines .pc-line{
+  position:static;
+  display:block;
+  width:var(--pc-message-rule-width, 346px);
+  height:1.4px;
+  background:rgba(255,255,255,.35);
+}
+
+.postcard-card--modern .pc-message{
+  position:absolute;
+  left:386px;
+  top:235px;
+  width:var(--pc-message-rule-width, 346px);
+  z-index:2;
+  pointer-events:none;
+}
+.postcard-card--modern .pc-message-row{
+  position:relative;
+  height:40px;
+  overflow:visible;
+}
+.postcard-card--modern .pc-message-text{
+  position:absolute;
+  left:0;
+  top:0;
+  display:block;
+  font-family:'Homemade Apple',cursive;
+  font-size:20px;
+  line-height:40px;
+  height:40px;
+  color:#fff;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:var(--pc-message-rule-width, 346px);
+}
+
+/* Title hint — back uses lighter ghost */
+.postcard-card--modern.postcard-card--back .pc-line-hint{
+  opacity:.2;
+}
+
+/* Postage stamp slot */
+.postcard-card--modern .pc-postage-slot{
+  position:absolute;
+  left:652px;
+  top:30px;
+  width:64px;
+  height:98px;
+  z-index:4;
+}
+.postcard-card--modern .pc-postage-frame{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  pointer-events:none;
+}
+.postcard-card--modern .pc-postage-art{
+  position:absolute;
+  left:10%;
+  top:7%;
+  width:80%;
+  height:87%;
+  object-fit:cover;
+  pointer-events:none;
+}
+.postcard-card--modern .pc-postage-inner{
+  position:absolute;
+  left:10%;
+  top:7%;
+  width:80%;
+  height:87%;
+  background:#d9d9d9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.postcard-card--modern .pc-postage-slot--empty{
+  cursor:pointer;
+}
+.postcard-card--modern .pc-postage-slot--empty .pc-slot-upload{
+  width:24px;
+  height:24px;
+  opacity:.4;
+  pointer-events:none;
+}
+.postcard-card--modern .pc-sticker-slot,
+.postcard-card--modern .pc-postage-slot--empty{
+  pointer-events:auto;
+  cursor:pointer;
+}
+
+.postcard-card--modern .pc-stamp-slot--back{
+  position:absolute;
+  left:518px;
+  top:373px;
+  width:83px;
+  height:85px;
+  z-index:5;
+}
+.postcard-card--modern .pc-stamp-slot--back img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+/* ===== Retro 70s — Figma nodes 1:16 front, 1:89 back ===== */
+.postcard-card--retro70.postcard-card--front .pc-front-title,
+.postcard-card--retro70.postcard-card--front .pc-front-title .pc-title-line1,
+.postcard-card--retro70.postcard-card--front .pc-front-title .pc-title-line2,
+.postcard-card--retro70.postcard-card--front .pc-front-title .pc-underline{
+  font-family:'Great Vibes',cursive;
+  font-weight:400;
+  color:var(--pc-front-title-color, #ffe0eb);
+}
+.postcard-card--retro70.postcard-card--front .pc-front-title{
+  left:80px;
+  top:auto;
+  bottom:80px;
+  font-size:80px;
+  line-height:80px;
+  transform:rotate(-10deg);
+  transform-origin:left bottom;
+}
+.postcard-card--retro70.postcard-card--front .pc-front-title .pc-underline{
+  text-decoration:underline;
+  text-decoration-thickness:2px;
+  text-underline-offset:4px;
+}
+.postcard-card--retro70 .pc-photo-gradient{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:linear-gradient(56.47deg, rgba(0,0,0,0.16) 4.03%, rgba(6,6,6,0) 53.54%);
+}
+
+.postcard-card--retro70.postcard-card--back .pc-back-inner{
+  border-color:rgba(0,0,0,0.16);
+}
+.postcard-card--retro70 .pc-back-divider{
+  background:rgba(0,0,0,0.16);
+}
+.postcard-card--retro70 .pc-back-title,
+.postcard-card--retro70 .pc-back-title .pc-title-line1,
+.postcard-card--retro70 .pc-back-title .pc-title-line2,
+.postcard-card--retro70 .pc-back-title .pc-underline{
+  font-family:'Great Vibes',cursive;
+  font-weight:400;
+}
+.postcard-card--retro70 .pc-back-title{
+  left:48px;
+  top:48px;
+  font-size:40px;
+  line-height:40px;
+  color:#0c0c0c;
+  transform:rotate(-10deg);
+  transform-origin:left top;
+}
+.postcard-card--retro70 .pc-back-title .pc-underline{
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+.postcard-card--retro70 .pc-stickers{
+  left:48px;
+  top:216px;
+}
+.postcard-card--retro70 .pc-sticker-slot--empty{
+  border-color:rgba(0,0,0,0.16);
+}
+.postcard-card--retro70 .pc-field label{
+  color:#282828;
+}
+.postcard-card--retro70 .pc-field .pc-handwriting{
+  color:#141ea9;
+}
+.postcard-card--retro70 .pc-field .pc-line,
+.postcard-card--retro70 .pc-message-lines .pc-line{
+  background:rgba(0,0,0,0.16);
+}
+.postcard-card--retro70 .pc-message-text{
+  color:#141ea9;
+}
+.postcard-card--retro70 .pc-postage-slot{
+  left:652px;
+  top:30px;
+  width:80px;
+  height:112px;
+}
+.postcard-card--retro70 .pc-postage-art{
+  left:10.53%;
+  top:7.14%;
+  width:80%;
+  height:87.5%;
+}
+.postcard-card--retro70 .pc-postage-inner{
+  left:10.53%;
+  top:7.14%;
+  width:80%;
+  height:87.5%;
+}
+.postcard-card--retro70 .pc-stamp-slot--front img,
+.postcard-card--retro70 .pc-stamp-slot--back img{
+  object-fit:contain;
+}
+
+/* ===== Vintage — Figma nodes 1:92 front, 1:95 back ===== */
+.postcard-card--vintage .pc-vintage-bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:0;
+  pointer-events:none;
+}
+.postcard-card--vintage .pc-vintage-inner-frame{
+  position:absolute;
+  left:34.67px;
+  top:31.69px;
+  width:758.62px;
+  height:506.74px;
+  z-index:4;
+  pointer-events:none;
+}
+.postcard-card--vintage.postcard-card--front .pc-photo{
+  left:35px;
+  top:32px;
+  width:758px;
+  height:506px;
+  border-radius:0;
+  z-index:2;
+}
+.postcard-card--vintage.postcard-card--front .pc-front-title,
+.postcard-card--vintage.postcard-card--front .pc-front-title .pc-title-line1,
+.postcard-card--vintage.postcard-card--front .pc-front-title .pc-title-line2,
+.postcard-card--vintage.postcard-card--front .pc-front-title .pc-underline{
+  font-family:'Rye',serif;
+  font-weight:400;
+  text-transform:uppercase;
+  color:var(--pc-front-title-color, #f6eed8);
+}
+.postcard-card--vintage.postcard-card--front .pc-front-title{
+  left:80px;
+  top:380px;
+  font-size:50px;
+  line-height:56px;
+  z-index:5;
+}
+.postcard-card--vintage.postcard-card--front .pc-front-title .pc-underline{
+  text-decoration:underline;
+  text-underline-offset:4px;
+}
+.postcard-card--vintage .pc-stamp-slot--front{
+  z-index:5;
+}
+.postcard-card--vintage .pc-stamp-slot--front img,
+.postcard-card--vintage .pc-stamp-slot--back img{
+  object-fit:contain;
+}
+.postcard-card--vintage.postcard-card--back .pc-back-inner{
+  border:none;
+  z-index:2;
+}
+.postcard-card--vintage.postcard-card--back .pc-vintage-bg{
+  z-index:0;
+}
+.postcard-card--vintage .pc-back-divider{
+  left:326px;
+  background:rgba(0,0,0,0.16);
+}
+.postcard-card--vintage .pc-back-title,
+.postcard-card--vintage .pc-back-title .pc-title-line1,
+.postcard-card--vintage .pc-back-title .pc-title-line2,
+.postcard-card--vintage .pc-back-title .pc-underline{
+  font-family:'Rye',serif;
+  font-weight:400;
+  text-transform:uppercase;
+  color:#000;
+}
+.postcard-card--vintage .pc-back-title{
+  left:48px;
+  top:48px;
+  font-size:28px;
+  line-height:36px;
+}
+.postcard-card--vintage .pc-back-title .pc-underline{
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+.postcard-card--vintage .pc-sticker-slot--empty{
+  border-color:rgba(0,0,0,0.16);
+}
+.postcard-card--vintage .pc-field label{
+  font-family:'Rye',serif;
+  font-size:16px;
+  line-height:30px;
+  color:#282828;
+  text-transform:uppercase;
+}
+.postcard-card--vintage .pc-field .pc-handwriting{
+  color:#141964;
+}
+.postcard-card--vintage .pc-field .pc-line,
+.postcard-card--vintage .pc-message-lines .pc-line{
+  background:rgba(0,0,0,0.16);
+}
+.postcard-card--vintage .pc-message{
+  top:267px;
+}
+.postcard-card--vintage .pc-message-lines{
+  top:300px;
+  gap:40px;
+}
+.postcard-card--vintage .pc-message-row{
+  height:38px;
+}
+.postcard-card--vintage .pc-message-text{
+  line-height:38px;
+  height:38px;
+  color:#141964;
+}
+.postcard-card--vintage .pc-postage-slot{
+  left:654px;
+  top:28px;
+  width:80px;
+  height:106px;
+}
+.postcard-card--vintage .pc-postage-art{
+  left:12px;
+  top:4px;
+  width:64px;
+  height:98px;
+}
+.postcard-card--vintage .pc-postage-inner{
+  left:12px;
+  top:4px;
+  width:64px;
+  height:98px;
+}
+
+</style>
+<style id="postcard-create">
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  min-height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  background:#fff;
+}
+
+/* Create postcard page — Figma 1440×1024 */
+.create-page{
+  --ink:#0c0c0c;
+  --bg:#fff;
+  --border:rgba(0,0,0,.1);
+  --fill-0:var(--page-frame-fill, #e7dde0);
+  min-height:100%;
+  width:100%;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Inter,system-ui,sans-serif;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+}
+
+.create-stage-wrap{
+  position:relative;
+  flex:0 0 auto;
+  margin:0 auto;
+}
+
+.create-stage{
+  position:relative;
+  width:1440px;
+  height:1024px;
+  flex:0 0 auto;
+  transform-origin:top center;
+  margin:0 auto;
+}
+
+.create-bg-deco{
+  position:absolute;
+  left:608px;
+  top:35px;
+  width:797px;
+  height:954px;
+  pointer-events:none;
+  z-index:0;
+  background:var(--page-frame-fill, #e7dde0);
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+}
+
+.create-divider-v{
+  position:absolute;
+  left:573px;
+  top:0;
+  width:1px;
+  height:1024px;
+  background:var(--border);
+  z-index:1;
+}
+
+/* ===== Left panel ===== */
+.create-panel{
+  position:absolute;
+  left:125px;
+  top:0;
+  width:408px;
+  height:100%;
+  z-index:2;
+}
+
+.create-topnav{
+  position:absolute;
+  left:125px;
+  top:80px;
+  display:flex;
+  align-items:center;
+  gap:32px;
+  z-index:3;
+}
+.create-topnav a{
+  display:block;
+  width:32px;
+  height:32px;
+  flex-shrink:0;
+}
+.create-topnav a img{width:100%;height:100%;display:block;object-fit:contain;}
+.create-side-tab{
+  border:none;
+  background:none;
+  padding:0;
+  cursor:pointer;
+  font-family:'Instrument Serif',Georgia,serif;
+  font-size:40px;
+  line-height:40px;
+  color:var(--ink);
+  text-transform:lowercase;
+}
+.create-side-tab.is-active{
+  font-style:italic;
+  text-decoration:underline;
+  text-underline-offset:4px;
+}
+.create-topnav-sep{
+  width:1px;
+  height:36px;
+  background:var(--border);
+  flex-shrink:0;
+}
+
+.create-field{
+  position:absolute;
+  left:0;
+  width:408px;
+}
+.create-field--style{top:160px;}
+.create-field--title{top:386px;}
+.create-field--color{top:520px;width:373px;}
+.create-field--stamp{top:630px;width:373px;}
+
+/* Back panel fields */
+.create-field--from{top:160px;}
+.create-field--to{top:276px;}
+.create-field--message{top:392px;}
+.create-field--stickers{
+  top:590px;
+  width:auto;
+  z-index:3;
+  padding-bottom:24px;
+}
+.create-field--postmark-back{top:830px;width:153px;}
+.create-field--postage-pick{top:830px;left:310px;width:auto;}
+
+.create-textarea-wrap{
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  min-height:120px;
+  padding:16px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:#fff;
+}
+.create-textarea-wrap img{width:24px;height:24px;flex-shrink:0;margin-top:2px;display:block;}
+.create-textarea-wrap textarea{
+  flex:1;
+  border:none;
+  outline:none;
+  resize:none;
+  min-height:88px;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  font-weight:500;
+  color:var(--ink);
+  background:transparent;
+  line-height:1.4;
+}
+.create-textarea-wrap textarea::placeholder{color:rgba(0,0,0,.6);}
+
+.create-picker-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  max-width:408px;
+  margin-bottom:12px;
+}
+.create-picker-item{
+  width:64px;
+  height:64px;
+  padding:4px;
+  border:2px solid transparent;
+  border-radius:4px;
+  background:transparent;
+  cursor:pointer;
+  flex-shrink:0;
+  transition:border-color .2s ease,opacity .2s ease;
+}
+.create-picker-item img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  border-radius:2px;
+  pointer-events:none;
+}
+.create-picker-item.is-active{border-color:var(--ink);}
+.create-picker-item.is-dim{opacity:.5;}
+
+.create-postage-pick{
+  display:flex;
+  gap:10px;
+}
+.create-postage-item{
+  position:relative;
+  width:46px;
+  height:64px;
+  padding:0;
+  border:2px solid transparent;
+  background:none;
+  cursor:pointer;
+  flex-shrink:0;
+  opacity:.5;
+  transition:border-color .2s ease,opacity .2s ease;
+}
+.create-postage-item.is-active{
+  border-color:var(--ink);
+  opacity:1;
+}
+.create-postage-frame{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  pointer-events:none;
+}
+.create-postage-art{
+  position:absolute;
+  left:10%;
+  top:7%;
+  width:80%;
+  height:87%;
+  object-fit:cover;
+  display:block;
+  pointer-events:none;
+}
+.create-postage-item img.create-postage-frame,
+.create-postage-item img.create-postage-art{
+  border-radius:0;
+}
+
+.create-finish{
+  position:absolute;
+  left:0;
+  top:960px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:170px;
+  height:60px;
+  padding:10px 32px;
+  border:none;
+  border-radius:8px;
+  background:var(--ink);
+  color:#fff;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  font-weight:500;
+  text-transform:capitalize;
+  cursor:pointer;
+  transition:opacity .2s ease,transform .15s ease;
+}
+.create-finish:hover{opacity:.88;}
+.create-finish:active{transform:scale(.98);}
+
+.create-field--postage-pick{
+  left:185px;
+  width:200px;
+}
+
+.create-label{
+  font-size:20px;
+  font-weight:600;
+  line-height:32px;
+  margin-bottom:10px;
+  color:var(--ink);
+}
+
+.create-styles{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+.create-style-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:24px;
+  padding:16px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:#fff;
+  cursor:pointer;
+  min-width:106px;
+  transition:border-color .2s ease;
+}
+.create-style-card.is-active{
+  border:2px solid var(--ink);
+  padding:15px;
+}
+.create-style-card:disabled{
+  opacity:.45;
+  cursor:default;
+}
+.create-style-card img{
+  width:74px;
+  height:68px;
+  object-fit:cover;
+  display:block;
+}
+.create-style-card span{
+  font-size:18px;
+  font-weight:500;
+  color:var(--ink);
+  white-space:nowrap;
+}
+
+.create-input-wrap{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  height:60px;
+  padding:10px 16px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:#fff;
+}
+.create-input-wrap img{width:24px;height:24px;flex-shrink:0;display:block;}
+.create-input-wrap input{
+  flex:1;
+  border:none;
+  outline:none;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  font-weight:500;
+  color:var(--ink);
+  background:transparent;
+  min-width:0;
+}
+.create-input-wrap input::placeholder{
+  color:rgba(0,0,0,.6);
+}
+
+.create-input-wrap--title{
+  height:60px;
+  align-items:center;
+}
+.create-input-wrap--title img{margin-top:0;}
+
+.create-colors{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  height:36px;
+}
+.create-color{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:2px solid transparent;
+  padding:0;
+  cursor:pointer;
+  flex-shrink:0;
+  transition:transform .15s ease;
+}
+.create-color:hover{transform:scale(1.08);}
+.create-color.is-active{
+  border-color:var(--ink);
+  box-shadow:0 0 0 2px var(--bg);
+}
+.create-color[data-color="white"]{
+  background:#fff;
+  border:1px solid rgba(0,0,0,.15);
+}
+.create-color[data-color="black"]{background:#0c0c0c;}
+.create-color[data-color="pink"]{background:#ffe0eb;}
+.create-color[data-color="yellow"]{background:#fef9dc;}
+.create-color[data-color="green"]{background:#dff5e5;}
+
+.create-stamps{
+  display:flex;
+  gap:10px;
+}
+.create-stamp{
+  position:relative;
+  width:64px;
+  height:64px;
+  padding:4px;
+  border:none;
+  background:#f0eeeb;
+  cursor:pointer;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.create-stamp-plate{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:#0c0c0c;
+  z-index:0;
+}
+.create-stamp--with-plate img{
+  position:relative;
+  z-index:1;
+}
+.create-stamp img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  border-radius:50%;
+}
+.create-stamp.is-active::after{
+  content:'';
+  position:absolute;
+  inset:-3px;
+  border:2px solid var(--ink);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+.create-next{
+  position:absolute;
+  left:0;
+  top:776px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  width:170px;
+  height:60px;
+  padding:10px 32px;
+  border:none;
+  border-radius:8px;
+  background:var(--ink);
+  color:#fff;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  font-weight:500;
+  line-height:1;
+  text-transform:capitalize;
+  cursor:pointer;
+  transition:opacity .2s ease,transform .15s ease;
+}
+.create-next:hover{opacity:.88;}
+.create-next:active{transform:scale(.98);}
+.create-next span{
+  display:block;
+  line-height:1;
+}
+.create-next img{
+  width:24px;
+  height:12px;
+  display:block;
+  flex-shrink:0;
+}
+.create-flip img{width:24px;height:24px;display:block;object-fit:contain;}
+
+.create-hero{
+  position:absolute;
+  left:573px;
+  top:0;
+  width:867px;
+  height:100%;
+  z-index:2;
+}
+
+/* ===== Right panel ===== */
+.create-preview-panel{
+  position:relative;
+  width:100%;
+  height:100%;
+}
+
+.create-heading{
+  position:absolute;
+  left:50%;
+  top:222px;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  font-family:'Instrument Serif',Georgia,serif;
+  font-size:60px;
+  font-weight:400;
+  font-style:normal;
+  line-height:60px;
+  color:var(--ink);
+  text-transform:lowercase;
+  white-space:nowrap;
+  pointer-events:none;
+}
+.create-heading u{
+  text-decoration:underline;
+  text-underline-offset:6px;
+}
+
+.create-preview-wrap{
+  position:absolute;
+  left:99px;
+  top:342px;
+  width:670px;
+  height:464px;
+  overflow:hidden;
+  cursor:pointer;
+}
+.create-preview-scale{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:826px;
+  height:572px;
+  margin-left:-413px;
+  margin-top:-286px;
+  pointer-events:none;
+  perspective:1200px;
+}
+.create-card-flip{
+  position:relative;
+  width:826px;
+  height:572px;
+  transform-origin:center center;
+  transform:scale(var(--preview-scale, 1)) rotateY(0deg);
+  will-change:transform;
+}
+.create-card-face{
+  position:absolute;
+  inset:0;
+}
+.create-card-flip.is-flipping.show-front .create-card-face--front,
+.create-card-flip:not(.is-flipped):not(.is-flipping) .create-card-face--front{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+.create-card-flip.is-flipping.show-front .create-card-face--back,
+.create-card-flip:not(.is-flipped):not(.is-flipping) .create-card-face--back{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.create-card-flip.is-flipping.show-back .create-card-face--back,
+.create-card-flip.is-flipped:not(.is-flipping) .create-card-face--back{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+.create-card-flip.is-flipping.show-back .create-card-face--front,
+.create-card-flip.is-flipped:not(.is-flipping) .create-card-face--front{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.create-preview-scale .pc-photo--empty,
+.create-preview-scale .pc-photo:not(.pc-photo--empty),
+.create-preview-scale .pc-sticker-slot,
+.create-preview-scale .pc-postage-slot--empty{
+  pointer-events:auto;
+  cursor:pointer;
+}
+
+.create-flip{
+  position:absolute;
+  left:50%;
+  top:838px;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:16px;
+  border:none;
+  background:none;
+  cursor:pointer;
+  padding:4px 8px;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  line-height:20px;
+  color:var(--ink);
+}
+.create-panel-back[hidden],
+.create-panel-front[hidden]{
+  display:none !important;
+}
+
+.create-back-meta{
+  display:contents;
+}
+
+@media (max-width:900px){
+  .create-page{
+    --mobile-pink:var(--page-frame-fill, #e7dde0);
+    --mobile-pad:var(--shell-pad, 32px);
+    display:flex;
+    flex-direction:column;
+    height:100dvh;
+    overflow:hidden;
+  }
+  html,body{
+    height:100%;
+    height:100dvh;
+    overflow:hidden;
+  }
+  body{align-items:stretch !important;}
+
+  .create-stage-wrap{
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    min-height:0;
+    width:100%;
+    max-width:var(--shell-max, 440px);
+    margin:0 auto;
+    overflow:hidden;
+  }
+
+  .create-stage{
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    min-height:0;
+    transform:none !important;
+    width:100%;
+    max-width:var(--shell-max, 440px);
+    margin:0 auto;
+    overflow:hidden;
+  }
+
+  .create-bg-deco,
+  .create-divider-v,
+  .create-heading{display:none;}
+
+  .create-topnav{
+    position:relative;
+    left:auto;
+    top:auto;
+    order:1;
+    flex-shrink:0;
+    gap:16px;
+    padding:40px 24px 0;
+    margin:0;
+    background:var(--mobile-pink);
+    z-index:2;
+  }
+  .create-topnav a{width:24px;height:24px;}
+  .create-side-tab{
+    font-size:30px;
+    line-height:38px;
+  }
+  .create-topnav-sep{height:30px;}
+
+  .create-hero{
+    position:relative;
+    left:auto;
+    top:auto;
+    order:2;
+    flex-shrink:0;
+    width:100%;
+    height:auto;
+    background:var(--mobile-pink);
+    padding:0 10px 24px;
+    z-index:2;
+  }
+
+  .create-preview-panel{
+    padding:0;
+    height:auto;
+  }
+
+  .create-preview-wrap{
+    position:relative;
+    left:auto;
+    top:auto;
+    width:min(calc(100vw - 20px), 420px);
+    max-width:100%;
+    aspect-ratio:826 / 572;
+    height:auto;
+    min-height:0;
+    margin:32px auto 0;
+    overflow:hidden;
+  }
+
+  .create-flip{
+    position:relative;
+    top:auto;
+    left:auto;
+    transform:none;
+    margin:24px auto 0;
+    gap:12px;
+    font-size:16px;
+    line-height:20px;
+    padding:0;
+  }
+  .create-flip img{width:18px;height:18px;}
+
+  .create-panel{
+    position:relative;
+    order:3;
+    flex:1;
+    min-height:0;
+    left:0;
+    width:100%;
+    padding:32px var(--mobile-pad) 40px;
+    height:auto;
+    background:#fff;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+  }
+
+  .create-field{
+    position:relative;
+    top:auto !important;
+    left:auto !important;
+    width:100% !important;
+    margin-bottom:0;
+  }
+  .create-field--style{margin-bottom:16px;}
+  .create-field--title,
+  .create-field--color,
+  .create-field--stamp,
+  .create-field--from,
+  .create-field--to,
+  .create-field--message{margin-bottom:16px;}
+  .create-field--stickers{
+    margin-bottom:16px;
+    padding-bottom:0;
+    z-index:auto;
+  }
+
+  .create-label{
+    font-size:18px;
+    line-height:28px;
+    margin-bottom:10px;
+  }
+
+  .create-styles{
+    gap:10px;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:4px;
+  }
+  .create-style-card{
+    width:119px;
+    min-width:119px;
+    gap:24px;
+    padding:16px;
+  }
+  .create-style-card.is-active{padding:15px;}
+  .create-style-card span{font-size:16px;}
+
+  .create-input-wrap input,
+  .create-textarea-wrap textarea{font-size:16px;}
+  .create-input-wrap input::placeholder,
+  .create-textarea-wrap textarea::placeholder{font-size:16px;}
+
+  .create-colors{height:36px;}
+
+  .create-back-meta{
+    display:flex;
+    gap:24px;
+    align-items:flex-start;
+    margin-bottom:16px;
+  }
+  .create-back-meta .create-field--postmark-back,
+  .create-back-meta .create-field--postage-pick{
+    flex:1;
+    margin-bottom:0;
+  }
+
+  .create-picker-row{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    max-width:none;
+    gap:8px;
+    margin-bottom:0;
+    padding-bottom:4px;
+  }
+
+  .create-next,
+  .create-finish{
+    position:relative;
+    top:auto;
+    left:auto;
+    width:100%;
+    max-width:var(--content-max, 376px);
+    margin:24px auto 0;
+    display:flex;
+  }
+
+  .create-panel-front .create-field--stamp{margin-bottom:0;}
+}
+</style>
+</head>
+<body>
+
+<div class="create-page" id="createPage">
+  <div class="create-stage-wrap" id="createStageWrap">
+  <div class="create-stage" id="createStage">
+
+    <div class="create-bg-deco" aria-hidden="true"></div>
+    <div class="create-divider-v" aria-hidden="true"></div>
+
+    <nav class="create-topnav" aria-label="Card side">
+      <a href="index.html" aria-label="Home">
+        <img data-create-asset="iconHome" alt="">
+      </a>
+      <button type="button" class="create-side-tab is-active" data-side="front">front side</button>
+      <span class="create-topnav-sep" aria-hidden="true"></span>
+      <button type="button" class="create-side-tab" data-side="back">back side</button>
+    </nav>
+
+    <div class="create-hero">
+      <section class="create-preview-panel" aria-label="Postcard preview">
+        <h1 class="create-heading">
+          <span>create your</span><br>
+          <span>own <u>postcard</u></span>
+        </h1>
+
+        <div class="create-preview-wrap" id="previewWrap" role="button" tabindex="0" aria-label="Flip postcard preview">
+          <div class="create-preview-scale">
+            <div class="create-card-flip" id="cardFlip">
+              <div class="create-card-face create-card-face--front" id="previewFront"></div>
+              <div class="create-card-face create-card-face--back" id="previewBack"></div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="create-flip" id="btnFlip">
+          <img data-create-asset="iconFlip" alt="">
+          <span>flip the card</span>
+        </button>
+      </section>
+    </div>
+
+    <!-- Left: front controls -->
+    <aside class="create-panel create-panel-front">
+      <div class="create-field create-field--style">
+        <p class="create-label">Choose style of card:</p>
+        <div class="create-styles" role="list">
+          <button type="button" class="create-style-card is-active" data-style="modern" role="listitem">
+            <img data-create-asset="styleModern" alt="">
+            <span>Modern</span>
+          </button>
+          <button type="button" class="create-style-card" data-style="retro70" role="listitem">
+            <img data-create-asset="styleRetro" alt="">
+            <span>Retro</span>
+          </button>
+          <button type="button" class="create-style-card" data-style="vintage" role="listitem">
+            <img data-create-asset="styleVintage" alt="">
+            <span>Vintage</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="create-field create-field--title">
+        <label class="create-label" for="titleInput">Add title:</label>
+        <div class="create-input-wrap create-input-wrap--title">
+          <img data-create-asset="iconTitle" alt="">
+          <input id="titleInput" type="text" placeholder="(e.g. postcard from vacation)" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="create-field create-field--color">
+        <p class="create-label">Choose color of the text:</p>
+        <div class="create-colors" role="radiogroup" aria-label="Text color">
+          <button type="button" class="create-color is-active" data-color="black" data-hex="#0c0c0c" aria-checked="true" role="radio" title="Black"></button>
+          <button type="button" class="create-color" data-color="white" data-hex="#ffffff" role="radio" title="White"></button>
+          <button type="button" class="create-color" data-color="pink" data-hex="#ffe0eb" role="radio" title="Pink"></button>
+          <button type="button" class="create-color" data-color="yellow" data-hex="#fef9dc" role="radio" title="Yellow"></button>
+          <button type="button" class="create-color" data-color="green" data-hex="#dff5e5" role="radio" title="Green"></button>
+        </div>
+      </div>
+
+      <div class="create-field create-field--stamp">
+        <p class="create-label">Add postmark:</p>
+        <div class="create-stamps" id="frontPostmarkPicker" role="radiogroup" aria-label="Postmark"></div>
+      </div>
+
+      <button type="button" class="create-next" id="btnNext">
+        <span>next</span>
+        <img data-create-asset="iconArrow" alt="">
+      </button>
+    </aside>
+
+    <!-- Left: back controls -->
+    <aside class="create-panel create-panel-back" hidden>
+      <div class="create-field create-field--from">
+        <label class="create-label" for="fromInput">From:</label>
+        <div class="create-input-wrap">
+          <img data-create-asset="iconTitle" alt="">
+          <input id="fromInput" type="text" placeholder="your name" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="create-field create-field--to">
+        <label class="create-label" for="toInput">To:</label>
+        <div class="create-input-wrap">
+          <img data-create-asset="iconTitle" alt="">
+          <input id="toInput" type="text" placeholder="name of person you think about" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="create-field create-field--message">
+        <label class="create-label" for="messageInput">Write your message:</label>
+        <div class="create-textarea-wrap">
+          <img data-create-asset="iconTitle" alt="">
+          <textarea id="messageInput" rows="4" placeholder="write a few words here...."></textarea>
+        </div>
+      </div>
+
+      <div class="create-field create-field--stickers">
+        <p class="create-label">Add stickers:</p>
+        <div class="create-picker-row" id="stickerPicker" role="group" aria-label="Stickers"></div>
+      </div>
+
+      <div class="create-back-meta">
+      <div class="create-field create-field--postmark-back">
+        <p class="create-label">Add postmark:</p>
+        <div class="create-stamps" id="backPostmarkPicker" role="radiogroup" aria-label="Back postmark"></div>
+      </div>
+
+      <div class="create-field create-field--postage-pick">
+        <p class="create-label">Add stamp:</p>
+        <div class="create-postage-pick" id="postagePicker" role="radiogroup" aria-label="Postage stamp"></div>
+      </div>
+      </div>
+
+      <button type="button" class="create-finish" id="btnFinish">Finish</button>
+    </aside>
+
+  </div>
+  </div>
+</div>
+
+<input id="fileInput" type="file" accept="image/*" hidden>
+<input id="stickerFileInput" type="file" accept="image/*" hidden>
+<input id="postageFileInput" type="file" accept="image/*" hidden>
+
+<script src="assets/retro-filter.js"></script>
+<script type="module" src="assets/postcard-card.js"></script>
+
+<script type="module">
+import { savePostcard } from './src/postcardStorage.js';
+import { compressImageFile, validateImageFile } from './src/imageUpload.js';
+import { applyCreatePageAssets } from './assets/create-page-assets.js';
+
+applyCreatePageAssets();
+const STAMP_GHOST_OPACITY = 0.35;
+const STAMP_BACK_GHOST_OPACITY = 0.4;
+
+function assetBasePath(src){
+  return src ? src.split('?')[0] : '';
+}
+
+function assetPathMatch(a, b){
+  return assetBasePath(a) === assetBasePath(b);
+}
+
+function stampOptionSelected(selected, options){
+  return options.some(opt => assetPathMatch(opt, selected));
+}
+
+const createPage = document.getElementById('createPage');
+const createStageWrap = document.getElementById('createStageWrap');
+const createStage = document.getElementById('createStage');
+const cardFlip = document.getElementById('cardFlip');
+const previewFront = document.getElementById('previewFront');
+const previewBack = document.getElementById('previewBack');
+const titleInput = document.getElementById('titleInput');
+const fromInput = document.getElementById('fromInput');
+const toInput = document.getElementById('toInput');
+const messageInput = document.getElementById('messageInput');
+const fileInput = document.getElementById('fileInput');
+const stickerFileInput = document.getElementById('stickerFileInput');
+const postageFileInput = document.getElementById('postageFileInput');
+const btnFlip = document.getElementById('btnFlip');
+const previewWrap = document.getElementById('previewWrap');
+const btnNext = document.getElementById('btnNext');
+const btnFinish = document.getElementById('btnFinish');
+const stickerPicker = document.getElementById('stickerPicker');
+const frontPostmarkPicker = document.getElementById('frontPostmarkPicker');
+const backPostmarkPicker = document.getElementById('backPostmarkPicker');
+const postagePicker = document.getElementById('postagePicker');
+
+let currentStyle = 'modern';
+let currentSide = 'front';
+let cardData = Object.assign({}, (typeof PostcardCard !== 'undefined' && PostcardCard.DEFAULT_DATA) || {}, {
+  stickers: [null, null, null, null],
+});
+let selectedFrontStamp = null;
+let selectedBackStamp = null;
+let selectedPostage = null;
+let activeStickerSlot = null;
+let pendingPhotoBlob = null;
+let photoPreviewUrl = null;
+
+function setPhotoPreview(blob){
+  if(photoPreviewUrl){
+    URL.revokeObjectURL(photoPreviewUrl);
+  }
+  pendingPhotoBlob = blob;
+  photoPreviewUrl = blob ? URL.createObjectURL(blob) : null;
+  cardData.photo = photoPreviewUrl;
+}
+
+function placeSticker(src){
+  const idx = cardData.stickers.findIndex(s => assetPathMatch(s, src));
+  if(idx !== -1){
+    cardData.stickers[idx] = null;
+    return;
+  }
+  const empty = cardData.stickers.findIndex(s => !s);
+  if(empty !== -1) cardData.stickers[empty] = src;
+}
+
+function remapStickersForStyle(fromStyle, toStyle){
+  const from = PostcardCard.stickerOptionsForStyle(fromStyle);
+  const to = PostcardCard.stickerOptionsForStyle(toStyle);
+  cardData.stickers = cardData.stickers.map(src=>{
+    if(!src) return null;
+    const idx = from.findIndex(opt => assetPathMatch(opt.src, src));
+    if(idx !== -1) return to[idx].src;
+    const base = assetBasePath(src).split('/').pop();
+    const match = to.find(opt => assetBasePath(opt.src).endsWith('/' + base));
+    return match ? match.src : src;
+  });
+}
+
+function syncStickerPickerUI(){
+  const options = PostcardCard.stickerOptionsForStyle(currentStyle);
+  const usedBases = new Set(cardData.stickers.filter(Boolean).map(assetBasePath));
+  stickerPicker.querySelectorAll('.create-picker-item').forEach(btn=>{
+    const i = Number(btn.dataset.index);
+    const src = options[i] ? options[i].src : '';
+    btn.classList.toggle('is-active', Boolean(src && usedBases.has(assetBasePath(src))));
+    btn.classList.remove('is-dim');
+  });
+}
+
+function parseTitleLines(raw){
+  const text = raw.trim();
+  if(!text) return { line1: '', line2: '' };
+  const space = text.indexOf(' ');
+  if(space === -1) return { line1: text, line2: '' };
+  return {
+    line1: text.slice(0, space).trim(),
+    line2: text.slice(space + 1).trim(),
+  };
+}
+
+function exportData(){
+  const d = Object.assign({}, cardData);
+  if(selectedFrontStamp){
+    d.stampFront = selectedFrontStamp;
+    d.stampFrontOpacity = 1;
+  }
+  if(selectedBackStamp){
+    d.stampBack = selectedBackStamp;
+    d.stampBackOpacity = 1;
+  }
+  if(selectedPostage) d.postageArt = selectedPostage;
+  return d;
+}
+
+function previewDataFor(side){
+  const d = Object.assign({}, cardData);
+  if(side === 'front'){
+    if(selectedFrontStamp){
+      d.stampFront = selectedFrontStamp;
+      d.stampFrontOpacity = 1;
+    } else if(PostcardCard.ghostStampForStyle){
+      d.stampFront = PostcardCard.ghostStampForStyle(currentStyle, 'front');
+      d.stampFrontOpacity = STAMP_GHOST_OPACITY;
+    }
+  } else {
+    if(selectedBackStamp){
+      d.stampBack = selectedBackStamp;
+      d.stampBackOpacity = 1;
+    } else if(PostcardCard.ghostStampForStyle){
+      d.stampBack = PostcardCard.ghostStampForStyle(currentStyle, 'back');
+      d.stampBackOpacity = STAMP_BACK_GHOST_OPACITY;
+    }
+    if(selectedPostage) d.postageArt = selectedPostage;
+  }
+  return d;
+}
+
+function bindFrontInteractions(root){
+  const photo = root.querySelector('.pc-photo');
+  if(photo){
+    photo.addEventListener('click', ()=> fileInput.click());
+  }
+}
+
+function bindBackInteractions(root){
+  root.querySelectorAll('.pc-sticker-slot').forEach(slot=>{
+    slot.addEventListener('click', ()=>{
+      const i = Number(slot.dataset.slot.replace('sticker-', ''));
+      if(slot.classList.contains('pc-sticker-slot--empty')){
+        activeStickerSlot = i;
+        stickerFileInput.click();
+        return;
+      }
+      cardData.stickers[i] = null;
+      syncStickerPickerUI();
+      mountPreview();
+    });
+  });
+  const postageSlot = root.querySelector('.pc-postage-slot--empty');
+  if(postageSlot){
+    postageSlot.addEventListener('click', ()=> postageFileInput.click());
+  }
+}
+
+function mountPreview(){
+  if(typeof PostcardCard === 'undefined' || !PostcardCard.createElement || !previewFront || !previewBack) return;
+  previewFront.replaceChildren(
+    PostcardCard.createElement(currentStyle, 'front', previewDataFor('front'))
+  );
+  previewBack.replaceChildren(
+    PostcardCard.createElement(currentStyle, 'back', previewDataFor('back'))
+  );
+  bindFrontInteractions(previewFront);
+  bindBackInteractions(previewBack);
+  fitPreview();
+}
+
+function setSide(side){
+  if(side === currentSide || cardFlip.classList.contains('is-flipping')) return;
+  const isBack = side === 'back';
+  currentSide = side;
+  createPage.classList.toggle('is-back', isBack);
+  document.querySelectorAll('.create-panel-front').forEach(el=>{ el.hidden = isBack; });
+  document.querySelectorAll('.create-panel-back').forEach(el=>{ el.hidden = !isBack; });
+  document.querySelectorAll('.create-side-tab').forEach(tab=>{
+    tab.classList.toggle('is-active', tab.dataset.side === side);
+  });
+  runFlipAnimation(isBack);
+}
+
+const FLIP_MS = 650;
+const FLIP_EASE = 'cubic-bezier(.4,0,.2,1)';
+
+function getPreviewScale(){
+  return getComputedStyle(cardFlip).getPropertyValue('--preview-scale').trim() || '1';
+}
+
+function runFlipAnimation(toBack){
+  const scale = getPreviewScale();
+  const half = FLIP_MS / 2;
+  cardFlip.classList.add('is-flipping', toBack ? 'show-front' : 'show-back');
+  cardFlip.classList.toggle('is-flipped', !toBack);
+
+  cardFlip.style.transition = 'transform ' + half + 'ms ' + FLIP_EASE;
+  cardFlip.style.transform = 'scale(' + scale + ') rotateY(' + (toBack ? 90 : -90) + 'deg)';
+
+  window.setTimeout(() => {
+    cardFlip.classList.toggle('is-flipped', toBack);
+    cardFlip.classList.remove('show-front', 'show-back');
+    cardFlip.classList.add(toBack ? 'show-back' : 'show-front');
+    cardFlip.style.transition = 'none';
+    cardFlip.style.transform = 'scale(' + scale + ') rotateY(' + (toBack ? -90 : 90) + 'deg)';
+
+    requestAnimationFrame(() => {
+      cardFlip.style.transition = 'transform ' + half + 'ms ' + FLIP_EASE;
+      cardFlip.style.transform = 'scale(' + scale + ') rotateY(0deg)';
+
+      window.setTimeout(() => {
+        cardFlip.classList.remove('is-flipping', 'show-front', 'show-back');
+        cardFlip.style.transition = '';
+        cardFlip.style.transform = '';
+      }, half);
+    });
+  }, half);
+}
+
+const PREVIEW_CARD_W = 826;
+const PREVIEW_CARD_H = 572;
+const DESKTOP_PREVIEW_W = 670;
+const DESIGN_W = 1440;
+const DESIGN_H = 1024;
+
+function fitPreview(){
+  const wrap = document.querySelector('.create-preview-wrap');
+  if(!wrap) return;
+
+  const mobile = window.matchMedia('(max-width:900px)').matches;
+  if(mobile){
+    wrap.style.width = '';
+    wrap.style.height = '';
+    const targetW = wrap.getBoundingClientRect().width || Math.min(window.innerWidth - 20, 420);
+    const scale = targetW / PREVIEW_CARD_W;
+    cardFlip.style.setProperty('--preview-scale', String(scale));
+    return;
+  }
+
+  const targetW = DESKTOP_PREVIEW_W;
+  const scale = targetW / PREVIEW_CARD_W;
+  const targetH = PREVIEW_CARD_H * scale;
+
+  cardFlip.style.setProperty('--preview-scale', String(scale));
+  wrap.style.width = targetW + 'px';
+  wrap.style.height = targetH + 'px';
+}
+
+function fitStage(){
+  const mobile = window.matchMedia('(max-width:900px)').matches;
+  createStage.style.transform = '';
+  createStage.style.transformOrigin = '';
+  createStage.style.width = '';
+  createStage.style.height = '';
+  createStage.style.margin = '';
+  createStage.style.zoom = '';
+  if(createStageWrap){
+    createStageWrap.style.width = '';
+    createStageWrap.style.height = '';
+    createStageWrap.style.overflow = '';
+  }
+
+  if(mobile){
+    createPage.style.overflow = 'hidden';
+    document.body.style.alignItems = 'stretch';
+    document.body.style.overflow = 'hidden';
+    fitPreview();
+    return;
+  }
+
+  const scale = Math.min(window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H, 1);
+  createPage.style.overflow = scale < 1 ? 'auto' : 'hidden';
+  document.body.style.alignItems = scale < 1 ? 'flex-start' : 'center';
+  document.body.style.overflow = scale < 1 ? 'auto' : 'hidden';
+
+  if(scale < 1){
+    createStage.style.transform = `scale(${scale})`;
+    createStage.style.transformOrigin = 'top left';
+    createStage.style.width = `${DESIGN_W}px`;
+    createStage.style.height = `${DESIGN_H}px`;
+    if(createStageWrap){
+      createStageWrap.style.width = `${Math.ceil(DESIGN_W * scale)}px`;
+      createStageWrap.style.height = `${Math.ceil(DESIGN_H * scale)}px`;
+      createStageWrap.style.overflow = 'hidden';
+    }
+  }
+
+  fitPreview();
+}
+
+function scheduleFitStage(){
+  fitStage();
+  requestAnimationFrame(fitStage);
+}
+
+function buildStickerPicker(){
+  if(!stickerPicker || !PostcardCard.stickerOptionsForStyle) return;
+  stickerPicker.replaceChildren();
+  PostcardCard.stickerOptionsForStyle(currentStyle).forEach((opt, i)=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'create-picker-item';
+    btn.dataset.index = String(i);
+    btn.title = opt.label;
+    btn.innerHTML = '<img src="' + opt.src + '" alt="' + opt.label + '">';
+    btn.addEventListener('click', ()=>{
+      placeSticker(opt.src);
+      syncStickerPickerUI();
+      mountPreview();
+    });
+    stickerPicker.appendChild(btn);
+  });
+  syncStickerPickerUI();
+}
+
+function buildFrontStampPicker(){
+  if(!frontPostmarkPicker || !PostcardCard.frontStampOptionsForStyle) return;
+  frontPostmarkPicker.replaceChildren();
+  const options = PostcardCard.frontStampOptionsForStyle(currentStyle);
+  if(selectedFrontStamp && !stampOptionSelected(selectedFrontStamp, options)){
+    selectedFrontStamp = null;
+  }
+  options.forEach((src, i)=>{
+    const withPlate = PostcardCard.stampNeedsPlate(src);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'create-stamp' + (withPlate ? ' create-stamp--with-plate' : '');
+    btn.dataset.stamp = src;
+    btn.setAttribute('role', 'radio');
+    btn.setAttribute('aria-checked', assetPathMatch(selectedFrontStamp, src) ? 'true' : 'false');
+    if(assetPathMatch(selectedFrontStamp, src)) btn.classList.add('is-active');
+    btn.innerHTML =
+      (withPlate ? '<span class="create-stamp-plate" aria-hidden="true"></span>' : '') +
+      '<img src="' + src + '" alt="Postmark style ' + (i + 1) + '">';
+    btn.addEventListener('click', ()=>{
+      if(assetPathMatch(selectedFrontStamp, src)){
+        selectedFrontStamp = null;
+        btn.classList.remove('is-active');
+        btn.setAttribute('aria-checked', 'false');
+      } else {
+        selectedFrontStamp = src;
+        frontPostmarkPicker.querySelectorAll('.create-stamp').forEach(b=>{
+          b.classList.toggle('is-active', b === btn);
+          b.setAttribute('aria-checked', b === btn ? 'true' : 'false');
+        });
+      }
+      mountPreview();
+    });
+    frontPostmarkPicker.appendChild(btn);
+  });
+}
+
+function buildBackStampPicker(){
+  if(!backPostmarkPicker || !PostcardCard.backStampOptionsForStyle) return;
+  backPostmarkPicker.replaceChildren();
+  const options = PostcardCard.backStampOptionsForStyle(currentStyle);
+  if(selectedBackStamp && !stampOptionSelected(selectedBackStamp, options)){
+    selectedBackStamp = null;
+  }
+  options.forEach((src, i)=>{
+    const withPlate = PostcardCard.stampNeedsPlate(src);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'create-stamp' + (withPlate ? ' create-stamp--with-plate' : '');
+    btn.dataset.stamp = src;
+    btn.setAttribute('role', 'radio');
+    btn.setAttribute('aria-checked', assetPathMatch(selectedBackStamp, src) ? 'true' : 'false');
+    if(assetPathMatch(selectedBackStamp, src)) btn.classList.add('is-active');
+    btn.innerHTML =
+      (withPlate ? '<span class="create-stamp-plate" aria-hidden="true"></span>' : '') +
+      '<img src="' + src + '" alt="Back postmark ' + (i + 1) + '">';
+    btn.addEventListener('click', ()=>{
+      if(assetPathMatch(selectedBackStamp, src)){
+        selectedBackStamp = null;
+        btn.classList.remove('is-active');
+        btn.setAttribute('aria-checked', 'false');
+      } else {
+        selectedBackStamp = src;
+        backPostmarkPicker.querySelectorAll('.create-stamp').forEach(b=>{
+          b.classList.toggle('is-active', b === btn);
+          b.setAttribute('aria-checked', b === btn ? 'true' : 'false');
+        });
+      }
+      mountPreview();
+    });
+    backPostmarkPicker.appendChild(btn);
+  });
+}
+
+function buildPostagePicker(){
+  if(!postagePicker || !PostcardCard.postageOptionsForStyle || !PostcardCard.postageFrameForStyle) return;
+  postagePicker.replaceChildren();
+  const options = PostcardCard.postageOptionsForStyle(currentStyle);
+  const frameSrc = PostcardCard.postageFrameForStyle(currentStyle);
+  if(selectedPostage && !stampOptionSelected(selectedPostage, options)){
+    selectedPostage = null;
+  }
+  options.forEach(src=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'create-postage-item';
+    btn.dataset.postage = src;
+    if(assetPathMatch(selectedPostage, src)){
+      btn.classList.add('is-active');
+      btn.setAttribute('aria-checked', 'true');
+    }
+    btn.innerHTML =
+      '<img class="create-postage-frame" src="' + frameSrc + '" alt="">' +
+      '<img class="create-postage-art" src="' + src + '" alt="">';
+    btn.addEventListener('click', ()=>{
+      if(assetPathMatch(selectedPostage, src)){
+        selectedPostage = null;
+        btn.classList.remove('is-active');
+        btn.setAttribute('aria-checked', 'false');
+      } else {
+        selectedPostage = src;
+        postagePicker.querySelectorAll('.create-postage-item').forEach(b=>{
+          b.classList.toggle('is-active', b === btn);
+          b.setAttribute('aria-checked', b === btn ? 'true' : 'false');
+        });
+      }
+      mountPreview();
+    });
+    postagePicker.appendChild(btn);
+  });
+}
+
+function buildPickers(){
+  buildStickerPicker();
+  buildFrontStampPicker();
+  buildBackStampPicker();
+  buildPostagePicker();
+}
+
+titleInput.addEventListener('input', ()=>{
+  const t = parseTitleLines(titleInput.value);
+  cardData.titleLine1 = t.line1;
+  cardData.titleLine2 = t.line2;
+  mountPreview();
+});
+
+fromInput.addEventListener('input', ()=>{
+  cardData.from = fromInput.value;
+  mountPreview();
+});
+
+toInput.addEventListener('input', ()=>{
+  cardData.to = toInput.value;
+  mountPreview();
+});
+
+messageInput.addEventListener('input', ()=>{
+  const fitted = PostcardCard.fitMessage(messageInput.value);
+  if(fitted !== messageInput.value){
+    const pos = fitted.length;
+    messageInput.value = fitted;
+    messageInput.setSelectionRange(pos, pos);
+  }
+  cardData.message = fitted;
+  mountPreview();
+});
+
+function syncTitleColorPicker(hex){
+  const retroPink = (typeof PostcardCard !== 'undefined' && PostcardCard.RETRO_DEFAULT_TITLE_COLOR) || '#ffe0eb';
+  document.querySelectorAll('.create-panel-front .create-color').forEach(b=>{
+    const active = b.dataset.hex === hex
+      || (hex === retroPink && b.dataset.color === 'pink');
+    b.classList.toggle('is-active', active);
+    b.setAttribute('aria-checked', active ? 'true' : 'false');
+  });
+}
+
+document.querySelectorAll('.create-panel-front .create-color').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    cardData.titleColor = btn.dataset.hex;
+    syncTitleColorPicker(btn.dataset.hex);
+    mountPreview();
+  });
+});
+
+document.querySelectorAll('.create-style-card').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const prevStyle = currentStyle;
+    currentStyle = btn.dataset.style;
+    remapStickersForStyle(prevStyle, currentStyle);
+    document.querySelectorAll('.create-style-card').forEach(b=> b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    const url = new URL(location.href);
+    if(currentStyle === 'modern'){
+      url.searchParams.delete('style');
+    } else {
+      url.searchParams.set('style', currentStyle);
+    }
+    history.replaceState(null, '', url);
+    if(window.PageTheme) window.PageTheme.applyPageTheme();
+    buildStickerPicker();
+    buildFrontStampPicker();
+    buildBackStampPicker();
+    buildPostagePicker();
+    if(currentStyle === 'retro70'){
+      syncTitleColorPicker(cardData.titleColor || PostcardCard.RETRO_DEFAULT_TITLE_COLOR);
+    }
+    if(currentStyle === 'vintage'){
+      syncTitleColorPicker(cardData.titleColor || PostcardCard.VINTAGE_DEFAULT_TITLE_COLOR);
+    }
+    mountPreview();
+  });
+});
+
+document.querySelectorAll('.create-side-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=> setSide(tab.dataset.side));
+});
+
+function isCardControlTarget(target){
+  return Boolean(target.closest(
+    '.pc-photo, .pc-sticker-slot, .pc-postage-slot--empty, .pc-upload-cta, .pc-slot-upload, input, textarea, button, a, label'
+  ));
+}
+
+function togglePreviewSide(){
+  setSide(currentSide === 'front' ? 'back' : 'front');
+}
+
+function handlePreviewFlip(e){
+  if(cardFlip.classList.contains('is-flipping')) return;
+  if(isCardControlTarget(e.target)) return;
+  togglePreviewSide();
+}
+
+if(previewWrap){
+  previewWrap.addEventListener('click', handlePreviewFlip);
+  previewWrap.addEventListener('keydown', (e)=>{
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    if(isCardControlTarget(e.target)) return;
+    e.preventDefault();
+    handlePreviewFlip(e);
+  });
+}
+
+btnFlip.addEventListener('click', togglePreviewSide);
+
+btnNext.addEventListener('click', ()=> setSide('back'));
+
+btnFinish.addEventListener('click', async ()=>{
+  try {
+    btnFinish.disabled = true;
+    const payload = {
+      style: currentStyle,
+      data: exportData(),
+    };
+    const id = await savePostcard(payload, { photoBlob: pendingPhotoBlob });
+    const shareUrl = new URL('postcard-share.html', window.location.href);
+    shareUrl.searchParams.set('id', id);
+    if(currentStyle !== 'modern'){
+      shareUrl.searchParams.set('style', currentStyle);
+    }
+    window.location.href = shareUrl.href;
+  } catch(err){
+    console.error(err);
+    alert(err.message || 'Could not save postcard');
+    btnFinish.disabled = false;
+  }
+});
+
+fileInput.addEventListener('change', async ()=>{
+  const file = fileInput.files[0];
+  fileInput.value = '';
+  if(!file) return;
+  try {
+    validateImageFile(file);
+    const blob = await compressImageFile(file);
+    setPhotoPreview(blob);
+    mountPreview();
+  } catch(err){
+    console.error(err);
+    alert(err.message || 'Could not load image');
+  }
+});
+
+stickerFileInput.addEventListener('change', ()=>{
+  const file = stickerFileInput.files[0];
+  if(!file || activeStickerSlot == null) return;
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    cardData.stickers[activeStickerSlot] = e.target.result;
+    syncStickerPickerUI();
+    mountPreview();
+    stickerFileInput.value = '';
+    activeStickerSlot = null;
+  };
+  reader.readAsDataURL(file);
+});
+
+postageFileInput.addEventListener('change', ()=>{
+  const file = postageFileInput.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    selectedPostage = e.target.result;
+    cardData.postageArt = e.target.result;
+    postagePicker.querySelectorAll('.create-postage-item').forEach(b=>{
+      b.classList.remove('is-active');
+      b.setAttribute('aria-checked', 'false');
+    });
+    mountPreview();
+    postageFileInput.value = '';
+  };
+  reader.readAsDataURL(file);
+});
+
+(function initStyleFromUrl(){
+  const style = new URLSearchParams(location.search).get('style');
+  if(!style) return;
+  const btn = document.querySelector('.create-style-card[data-style="' + style + '"]');
+  if(!btn) return;
+  currentStyle = style;
+  document.querySelectorAll('.create-style-card').forEach(b=> b.classList.remove('is-active'));
+  btn.classList.add('is-active');
+  if(style === 'retro70'){
+    const retroPink = PostcardCard.RETRO_DEFAULT_TITLE_COLOR || '#ffe0eb';
+    cardData.titleColor = retroPink;
+    syncTitleColorPicker(retroPink);
+  }
+  if(style === 'vintage'){
+    const vintageCream = PostcardCard.VINTAGE_DEFAULT_TITLE_COLOR || '#f6eed8';
+    cardData.titleColor = vintageCream;
+    syncTitleColorPicker(vintageCream);
+  }
+  if(window.PageTheme) window.PageTheme.applyPageTheme(currentStyle);
+})();
+
+function safeBuildPickers(){
+  if(typeof PostcardCard === 'undefined'){
+    console.error('[create] postcard-card.js failed to load');
+    return;
+  }
+  try {
+    buildPickers();
+  } catch (err) {
+    console.error('[create] buildPickers failed', err);
+  }
+}
+
+function initPreview(){
+  try {
+    mountPreview();
+  } catch (err) {
+    console.error('[create] mountPreview failed', err);
+  }
+}
+
+safeBuildPickers();
+initPreview();
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(initPreview);
+}
+scheduleFitStage();
+window.addEventListener('resize', scheduleFitStage);
+window.addEventListener('orientationchange', scheduleFitStage);
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', scheduleFitStage);
+}
+</script>
+</body>
+</html>

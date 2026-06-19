@@ -1,0 +1,113 @@
+import { supabase } from './supabaseClient.js';
+
+export const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+export const MAX_IMAGE_DIMENSION = 1600;
+export const POSTCARD_IMAGES_BUCKET = 'postcard-images';
+
+export function isDataUrl(value){
+  return typeof value === 'string' && value.startsWith('data:image/');
+}
+
+export function isRemotePhotoUrl(value){
+  return typeof value === 'string'
+    && (value.startsWith('http://') || value.startsWith('https://'));
+}
+
+export function validateImageFile(file){
+  if(!file){
+    throw new Error('Файл не обрано.');
+  }
+  if(!file.type.startsWith('image/')){
+    throw new Error('Оберіть файл зображення.');
+  }
+  if(file.size > MAX_FILE_SIZE_BYTES){
+    throw new Error('Файл завеликий. Максимальний розмір — 5 МБ.');
+  }
+}
+
+export async function compressImageFile(file, maxDim = MAX_IMAGE_DIMENSION){
+  validateImageFile(file);
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+  const width = Math.max(1, Math.round(bitmap.width * scale));
+  const height = Math.max(1, Math.round(bitmap.height * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if(!ctx){
+    bitmap.close();
+    throw new Error('Не вдалося обробити зображення.');
+  }
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+  const outputType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+  const quality = outputType === 'image/jpeg' ? 0.85 : undefined;
+  const blob = await new Promise((resolve, reject)=>{
+    canvas.toBlob(
+      (result)=> result ? resolve(result) : reject(new Error('Не вдалося стиснути зображення.')),
+      outputType,
+      quality,
+    );
+  });
+  return blob;
+}
+
+function extensionForMime(type){
+  if(type === 'image/png') return 'png';
+  if(type === 'image/webp') return 'webp';
+  if(type === 'image/gif') return 'gif';
+  return 'jpg';
+}
+
+function dataUrlToBlob(dataUrl){
+  const [header, base64] = dataUrl.split(',');
+  if(!base64){
+    throw new Error('Некоректне зображення.');
+  }
+  const mime = header.match(/data:([^;]+)/)?.[1] || 'image/jpeg';
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for(let i = 0; i < binary.length; i += 1){
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new Blob([bytes], { type: mime });
+}
+
+export async function uploadPhotoBlob(blob){
+  const ext = extensionForMime(blob.type || 'image/jpeg');
+  const path = `${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(POSTCARD_IMAGES_BUCKET)
+    .upload(path, blob, {
+      contentType: blob.type || 'image/jpeg',
+      cacheControl: '3600',
+      upsert: false,
+    });
+  if(error) throw error;
+  const { data } = supabase.storage.from(POSTCARD_IMAGES_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+export async function resolvePhotoForStorage(photoValue, photoBlob){
+  if(photoBlob){
+    return uploadPhotoBlob(photoBlob);
+  }
+  if(!photoValue){
+    return null;
+  }
+  if(isRemotePhotoUrl(photoValue) || photoValue.startsWith('assets/')){
+    return photoValue;
+  }
+  if(isDataUrl(photoValue)){
+    return uploadPhotoBlob(dataUrlToBlob(photoValue));
+  }
+  if(photoValue.startsWith('blob:')){
+    const response = await fetch(photoValue);
+    if(!response.ok){
+      throw new Error('Не вдалося прочитати попередній перегляд фото.');
+    }
+    return uploadPhotoBlob(await response.blob());
+  }
+  return photoValue;
+}

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share your postcard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&family=Great+Vibes&family=Homemade+Apple&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=Rye&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/frame-background.css">
+<link rel="stylesheet" href="assets/share.css">
+<link rel="stylesheet" href="assets/mobile-responsive.css">
+<script src="assets/frame-background.js"></script>
+</head>
+<body>
+<div class="share-sheet frame-sheet" id="shareSheet" aria-hidden="true">
+  <svg class="share-stamp frame-stamp" id="shareStamp" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none" overflow="visible">
+    <defs>
+      <mask id="stampMask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+        <rect id="stampMaskFill" fill="#fff"/>
+        <g id="stampHoleCircles" fill="#000"/>
+      </mask>
+    </defs>
+    <rect id="stampFill" mask="url(#stampMask)"/>
+  </svg>
+</div>
+
+<div class="share-page frame-page" id="sharePage">
+  <div class="share-stage-wrap" id="shareStageWrap">
+  <div class="share-stage" id="shareStage">
+
+    <h1 class="share-heading">share your <em>postcard!</em></h1>
+
+    <div class="share-preview" id="sharePreview" role="button" tabindex="0" aria-pressed="false" aria-label="Flip postcard preview" aria-live="polite">
+      <div class="preview-compose">
+        <img class="share-envelope" src="assets/welcome/modern/envelope.png" alt="">
+        <img class="share-card-back" id="shareCardBack" src="" alt="">
+        <img class="share-card-front" id="shareCardFront" src="" alt="Your postcard preview">
+      </div>
+    </div>
+
+    <div class="share-panel">
+      <div class="share-link-block">
+        <p class="share-label">Share your postcard:</p>
+        <div class="share-link-field">
+          <img class="share-link-icon" src="assets/share/icon-link.svg" alt="">
+          <span class="share-link-text" id="shareLinkText">htttp//:example_of_your_future_link</span>
+        </div>
+      </div>
+      <button type="button" class="share-copy-btn" id="btnCopy">
+        <span class="share-copy-label">Copy</span>
+        <img class="share-copy-icon" src="assets/share/icon-copy.svg" alt="">
+      </button>
+    </div>
+
+  </div>
+  </div>
+</div>
+
+<script src="assets/retro-filter.js"></script>
+<script type="module" src="assets/postcard-card.js"></script>
+<script type="module">
+import { getPostcardIdFromUrl, loadPostcard } from './src/postcardStorage.js';
+const sharePage = document.getElementById('sharePage');
+const shareStageWrap = document.getElementById('shareStageWrap');
+const shareStage = document.getElementById('shareStage');
+const sharePreview = document.getElementById('sharePreview');
+const shareCardFront = document.getElementById('shareCardFront');
+const shareCardBack = document.getElementById('shareCardBack');
+const shareEnvelope = document.querySelector('.share-envelope');
+const shareLinkText = document.getElementById('shareLinkText');
+const btnCopy = document.getElementById('btnCopy');
+const copyLabel = btnCopy.querySelector('.share-copy-label');
+const shareSheet = document.getElementById('shareSheet');
+const shareStamp = document.getElementById('shareStamp');
+const stampFill = document.getElementById('stampFill');
+const stampMask = document.getElementById('stampMask');
+const stampMaskFill = document.getElementById('stampMaskFill');
+const stampHoleCircles = document.getElementById('stampHoleCircles');
+
+const frameBg = FrameBackground.create({
+  sheet: shareSheet,
+  stamp: shareStamp,
+  stampFill,
+  stampMask,
+  stampMaskFill,
+  stampHoleCircles,
+});
+
+const ENVELOPE_SRC = {
+  modern: 'assets/welcome/modern/envelope.png',
+  retro70: 'assets/welcome/retro/envelope.png',
+  vintage: 'assets/welcome/vintage/envelope.png',
+};
+
+function cardStyleKey(raw){
+  if(!raw || raw === 'modern') return 'modern';
+  if(raw === 'retro' || raw === 'retro70') return 'retro70';
+  if(raw === 'vintage') return 'vintage';
+  return ENVELOPE_SRC[raw] ? raw : 'modern';
+}
+
+function resolveShareStyle(saved){
+  if(saved && saved.style) return saved.style;
+  const fromUrl = new URLSearchParams(window.location.search).get('style');
+  if(fromUrl) return fromUrl;
+  if(saved && saved.theme) return saved.theme;
+  return 'modern';
+}
+
+function applyShareTheme(rawStyle){
+  const raw = rawStyle || resolveShareStyle(null);
+  const cardStyle = cardStyleKey(raw);
+  FrameBackground.applyTheme(sharePage, raw);
+  document.documentElement.dataset.cardStyle = cardStyle;
+  if(shareEnvelope){
+    shareEnvelope.src = ENVELOPE_SRC[cardStyle] || ENVELOPE_SRC.modern;
+  }
+  scheduleFit();
+}
+
+const { DESIGN_W, DESIGN_H } = FrameBackground;
+const FLIP_MS = 550;
+
+let cardFlipped = false;
+let flipping = false;
+
+function getShareInset(){
+  return frameBg.getInset();
+}
+
+function fitStampSheet(){
+  frameBg.fitStampSheet();
+}
+
+function fitStage(){
+  const mobile = window.matchMedia('(max-width:900px)').matches;
+  shareStage.style.transform = '';
+  shareStage.style.width = '';
+  shareStage.style.height = '';
+  shareStage.style.margin = '';
+  shareStage.style.transformOrigin = '';
+  sharePage.style.overflow = mobile ? 'hidden' : '';
+  if(shareStageWrap){
+    shareStageWrap.style.width = '';
+    shareStageWrap.style.height = '';
+    shareStageWrap.style.overflow = '';
+  }
+  if(mobile){
+    fitStampSheet();
+    return;
+  }
+  const inset = getShareInset();
+  const vpW = window.innerWidth;
+  const vpH = window.innerHeight;
+  const availW = vpW - inset * 2;
+  const availH = vpH - inset * 2;
+  const scale = Math.min(availW / DESIGN_W, availH / DESIGN_H, 1);
+  sharePage.style.overflow = scale < 1 ? 'auto' : 'hidden';
+  if(scale < 1){
+    shareStage.style.transform = `scale(${scale})`;
+    shareStage.style.transformOrigin = 'top left';
+    shareStage.style.width = `${DESIGN_W}px`;
+    shareStage.style.height = `${DESIGN_H}px`;
+    shareStage.style.margin = '0';
+    if(shareStageWrap){
+      shareStageWrap.style.width = `${Math.ceil(DESIGN_W * scale)}px`;
+      shareStageWrap.style.height = `${Math.ceil(DESIGN_H * scale)}px`;
+      shareStageWrap.style.overflow = 'hidden';
+    }
+  }
+  fitStampSheet();
+}
+
+async function loadCardPreview(){
+  const id = getPostcardIdFromUrl();
+  if(!id){
+    window.location.replace('postcard-create.html');
+    return;
+  }
+
+  let saved = null;
+  try {
+    saved = await loadPostcard(id);
+  } catch(err){
+    console.error(err);
+  }
+
+  applyShareTheme(resolveShareStyle(saved));
+
+  if(saved && saved.data){
+    return renderSavedCard(cardStyleKey(saved.style || saved.theme), saved.data);
+  }
+
+  window.location.replace('postcard-create.html');
+}
+
+async function renderSavedCard(style, data){
+  sharePreview.classList.add('is-loading');
+  try {
+    if(document.fonts && document.fonts.ready){
+      await document.fonts.ready;
+    }
+    const merged = Object.assign({}, PostcardCard.DEFAULT_DATA, data);
+    const [front, back] = await Promise.all([
+      PostcardCard.toDataURL(style, 'front', merged, 2),
+      PostcardCard.toDataURL(style, 'back', merged, 2),
+    ]);
+    shareCardFront.src = front;
+    shareCardFront.alt = 'Your postcard front';
+    shareCardBack.src = back;
+    shareCardBack.alt = 'Your postcard back';
+    sharePreview.classList.add('is-ready');
+  } catch(err){
+    console.error(err);
+    alert('Could not load your postcard');
+    window.location.replace('postcard-create.html');
+  } finally {
+    sharePreview.classList.remove('is-loading');
+  }
+}
+
+function setShareLink(){
+  const id = getPostcardIdFromUrl();
+  if(!id) return;
+  const url = new URL('postcard-view.html', window.location.href);
+  url.searchParams.set('id', id);
+  const themeRaw = new URLSearchParams(window.location.search).get('style');
+  if(themeRaw && themeRaw !== 'modern'){
+    url.searchParams.set('style', themeRaw);
+  }
+  shareLinkText.textContent = url.href;
+}
+
+function toggleCardFlip(){
+  if(flipping) return;
+  flipping = true;
+  cardFlipped = !cardFlipped;
+  sharePreview.classList.toggle('is-flipped', cardFlipped);
+  sharePreview.setAttribute('aria-pressed', String(cardFlipped));
+  window.setTimeout(()=>{ flipping = false; }, FLIP_MS);
+}
+
+async function copyShareLink(){
+  const text = shareLinkText.textContent.trim();
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  copyLabel.textContent = 'Copied';
+  btnCopy.classList.add('is-copied');
+  window.setTimeout(()=>{
+    copyLabel.textContent = 'Copy';
+    btnCopy.classList.remove('is-copied');
+  }, 1600);
+}
+
+sharePreview.addEventListener('click', toggleCardFlip);
+sharePreview.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' || e.key === ' '){
+    e.preventDefault();
+    toggleCardFlip();
+  }
+});
+
+btnCopy.addEventListener('click', copyShareLink);
+
+function scheduleFit(){
+  fitStage();
+  requestAnimationFrame(fitStage);
+}
+
+async function initSharePage(){
+  await loadCardPreview();
+  setShareLink();
+  scheduleFit();
+}
+
+initSharePage();
+window.addEventListener('resize', scheduleFit);
+window.addEventListener('orientationchange', scheduleFit);
+window.addEventListener('load', scheduleFit);
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', scheduleFit);
+}
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(scheduleFit);
+}
+</script>
+</body>
+</html>
