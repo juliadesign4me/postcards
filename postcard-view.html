@@ -66,7 +66,7 @@
 
 <script type="module" src="assets/postcard-card.js"></script>
 <script type="module">
-import { resolvePostcardId, loadPostcard } from './src/postcardStorage.js';
+import { resolveShareId, loadPostcard } from './src/postcardStorage.js';
 const viewPage = document.getElementById('viewPage');
 const viewStageWrap = document.getElementById('viewStageWrap');
 const viewStage = document.getElementById('viewStage');
@@ -282,7 +282,7 @@ function getPreviewExport(){
 async function initViewPage(){
   let saved = getPreviewExport();
   if(!saved){
-    const id = resolvePostcardId();
+    const id = resolveShareId();
     if(!id){
       window.location.replace('postcard-create.html');
       return;

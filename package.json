@@ -5,12 +5,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:apply-rls": "node scripts/apply-share-id-rls.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.8"
   },
   "devDependencies": {
+    "pg": "^8.22.0",
     "vite": "^6.3.5"
   }
 }

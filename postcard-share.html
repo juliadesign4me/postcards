@@ -61,8 +61,8 @@
 <script type="module" src="assets/postcard-card.js"></script>
 <script type="module">
 import {
-  resolvePostcardId,
-  syncPostcardIdInUrl,
+  resolveShareId,
+  syncShareIdInUrl,
   buildPostcardViewUrl,
   loadPostcard,
 } from './src/postcardStorage.js';
@@ -177,13 +177,13 @@ function fitStage(){
   fitStampSheet();
 }
 
-async function loadCardPreview(postcardId){
-  const id = postcardId || resolvePostcardId();
+async function loadCardPreview(shareId){
+  const id = shareId || resolveShareId();
   if(!id){
     window.location.replace('postcard-create.html');
     return null;
   }
-  syncPostcardIdInUrl(id);
+  syncShareIdInUrl(id);
 
   let saved = null;
   try {
@@ -228,8 +228,8 @@ async function renderSavedCard(style, data){
   }
 }
 
-function setShareLink(postcardId){
-  const id = postcardId || resolvePostcardId();
+function setShareLink(shareId){
+  const id = shareId || resolveShareId();
   if(!id) return;
   const themeRaw = new URLSearchParams(window.location.search).get('style');
   shareLinkText.textContent = buildPostcardViewUrl(id, { style: themeRaw });
@@ -283,13 +283,13 @@ function scheduleFit(){
 }
 
 async function initSharePage(){
-  const postcardId = resolvePostcardId();
-  if(postcardId){
-    syncPostcardIdInUrl(postcardId);
-    setShareLink(postcardId);
+  const shareId = resolveShareId();
+  if(shareId){
+    syncShareIdInUrl(shareId);
+    setShareLink(shareId);
   }
-  await loadCardPreview(postcardId);
-  setShareLink(postcardId);
+  await loadCardPreview(shareId);
+  setShareLink(shareId);
   scheduleFit();
 }
 
