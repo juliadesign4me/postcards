@@ -240,6 +240,27 @@ body{
   color:#0c0c0c;
 }
 
+.welcome-credit{
+  margin:0;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:14px;
+  line-height:20px;
+  font-weight:400;
+  color:rgba(12,12,12,.45);
+  text-align:center;
+}
+
+.welcome-credit a{
+  color:inherit;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  transition:color .2s ease;
+}
+
+.welcome-credit a:hover{
+  color:#0c0c0c;
+}
+
 .welcome-cta-icon{
   display:grid;
   place-items:center;
@@ -341,6 +362,15 @@ body{
   gap:24px;
   z-index:10;
   pointer-events:auto;
+}
+
+.welcome-credit{
+  position:absolute;
+  left:50%;
+  bottom:48px;
+  transform:translateX(-50%);
+  z-index:2;
+  white-space:nowrap;
 }
 }
 
@@ -455,6 +485,20 @@ body{
     font-size:28px;
     line-height:32px;
     text-align:center;
+  }
+
+  .welcome-credit{
+    position:relative;
+    left:auto;
+    bottom:auto;
+    transform:none;
+    order:5;
+    width:min(var(--content-max, 376px), 100%);
+    max-width:var(--content-max, 376px);
+    margin:16px auto 0;
+    font-size:12px;
+    line-height:16px;
+    flex-shrink:0;
   }
 
   .welcome-cta{
