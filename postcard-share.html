@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&family=Great+Vibes&family=Homemade+Apple&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=Rye&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/frame-background.css">
+<link rel="stylesheet" href="assets/postcard-card.css">
 <link rel="stylesheet" href="assets/share.css">
 <link rel="stylesheet" href="assets/mobile-responsive.css">
 <script src="assets/frame-background.js"></script>
@@ -34,11 +35,19 @@
 
     <div class="share-card-slot" id="shareCardSlot">
       <div class="share-preview-placeholder" id="sharePreviewPlaceholder" aria-hidden="true"></div>
-      <div class="share-preview" id="sharePreview" hidden role="button" tabindex="0" aria-pressed="false" aria-label="Flip postcard preview" aria-live="polite">
+      <div class="share-preview-raster" id="sharePreviewRaster" hidden aria-hidden="true">
         <div class="preview-compose">
           <img class="share-envelope" src="assets/welcome/modern/envelope.png" alt="">
           <img class="share-card-back" id="shareCardBack" src="" alt="">
           <img class="share-card-front" id="shareCardFront" src="" alt="Your postcard preview">
+        </div>
+      </div>
+      <div class="share-preview-live" id="sharePreview" hidden role="button" tabindex="0" aria-pressed="false" aria-label="Flip postcard preview" aria-live="polite">
+        <div class="share-card-scale" id="shareCardScale">
+          <div class="share-card-flip" id="shareCardFlip">
+            <div class="share-card-face share-card-face--front" id="shareCardFrontMount"></div>
+            <div class="share-card-face share-card-face--back" id="shareCardBackMount"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -74,11 +83,16 @@ const sharePage = document.getElementById('sharePage');
 const shareStageWrap = document.getElementById('shareStageWrap');
 const shareStage = document.getElementById('shareStage');
 const shareCardSlot = document.getElementById('shareCardSlot');
+const sharePreviewRaster = document.getElementById('sharePreviewRaster');
 const sharePreview = document.getElementById('sharePreview');
 const sharePreviewPlaceholder = document.getElementById('sharePreviewPlaceholder');
 const shareCardFront = document.getElementById('shareCardFront');
 const shareCardBack = document.getElementById('shareCardBack');
-const shareEnvelope = document.querySelector('#sharePreview .share-envelope');
+const shareCardScale = document.getElementById('shareCardScale');
+const shareCardFlip = document.getElementById('shareCardFlip');
+const shareCardFrontMount = document.getElementById('shareCardFrontMount');
+const shareCardBackMount = document.getElementById('shareCardBackMount');
+const shareEnvelope = document.querySelector('#sharePreviewRaster .share-envelope');
 const shareLinkText = document.getElementById('shareLinkText');
 const btnCopy = document.getElementById('btnCopy');
 const copyLabel = btnCopy.querySelector('.share-copy-label');
@@ -125,13 +139,53 @@ function hideSharePreviewPlaceholder(){
 
 function revealSharePreview(){
   hideSharePreviewPlaceholder();
-  if(sharePreview){
+  if(isShareMobile()){
+    sharePreviewRaster.hidden = true;
     sharePreview.hidden = false;
     sharePreview.style.display = '';
+  } else {
+    sharePreview.hidden = true;
+    sharePreviewRaster.hidden = false;
+    sharePreviewRaster.style.display = '';
   }
   sharePage.classList.remove('is-loading');
   sharePageReady = true;
   scheduleFit();
+}
+
+function fitShareLiveCard(){
+  if(!isShareMobile() || sharePreviewMode !== 'live') return;
+  const slotW = shareCardSlot.getBoundingClientRect().width || Math.min(window.innerWidth - 64, 376);
+  const scale = slotW / CARD_W;
+  shareCardScale.style.setProperty('--share-scale', String(scale));
+  shareCardScale.style.width = CARD_W + 'px';
+  shareCardScale.style.height = CARD_H + 'px';
+  shareCardScale.style.transform = '';
+  shareCardScale.style.margin = '0';
+}
+
+function mountShareLiveCard(style, data){
+  shareCardFrontMount.replaceChildren(PostcardCard.createElement(style, 'front', data));
+  shareCardBackMount.replaceChildren(PostcardCard.createElement(style, 'back', data));
+  sharePreviewMode = 'live';
+  shareCardFlip.classList.remove('is-flipped');
+  fitShareLiveCard();
+}
+
+async function mountShareRasterCard(style, data){
+  const [front, back] = await Promise.all([
+    PostcardCard.toDataURL(style, 'front', data, 2),
+    PostcardCard.toDataURL(style, 'back', data, 2),
+  ]);
+  shareCardFront.removeAttribute('src');
+  shareCardBack.removeAttribute('src');
+  shareCardFront.src = front;
+  shareCardFront.alt = 'Your postcard front';
+  shareCardBack.src = back;
+  shareCardBack.alt = 'Your postcard back';
+  await decodeShareImages();
+  sharePreviewRaster.classList.add('is-ready');
+  sharePreviewMode = 'raster';
 }
 
 function getPreviewExport(){
@@ -151,7 +205,17 @@ function getPreviewExport(){
 }
 
 const { DESIGN_W, DESIGN_H } = FrameBackground;
+const CARD_W = PostcardCard.W;
+const CARD_H = PostcardCard.H;
 const FLIP_MS = 550;
+const FLIP_EASE = 'cubic-bezier(.4,0,.2,1)';
+
+function isShareMobile(){
+  return window.matchMedia('(max-width:900px)').matches;
+}
+
+let sharePreviewMode = 'raster';
+let savedPreviewData = null;
 
 let cardFlipped = false;
 let flipping = false;
@@ -179,6 +243,7 @@ function fitStage(){
     shareStageWrap.style.overflow = '';
   }
   if(mobile){
+    fitShareLiveCard();
     fitStampSheet();
     return;
   }
@@ -247,18 +312,12 @@ async function renderSavedCard(style, data){
       await document.fonts.ready;
     }
     const merged = Object.assign({}, PostcardCard.DEFAULT_DATA, data);
-    const [front, back] = await Promise.all([
-      PostcardCard.toDataURL(style, 'front', merged, 2),
-      PostcardCard.toDataURL(style, 'back', merged, 2),
-    ]);
-    shareCardFront.removeAttribute('src');
-    shareCardBack.removeAttribute('src');
-    shareCardFront.src = front;
-    shareCardFront.alt = 'Your postcard front';
-    shareCardBack.src = back;
-    shareCardBack.alt = 'Your postcard back';
-    await decodeShareImages();
-    sharePreview.classList.add('is-ready');
+    savedPreviewData = { style, data: merged };
+    if(isShareMobile()){
+      mountShareLiveCard(style, merged);
+    } else {
+      await mountShareRasterCard(style, merged);
+    }
     revealSharePreview();
   } catch(err){
     console.error(err);
@@ -277,7 +336,13 @@ function toggleCardFlip(){
   if(flipping) return;
   flipping = true;
   cardFlipped = !cardFlipped;
-  sharePreview.classList.toggle('is-flipped', cardFlipped);
+  if(sharePreviewMode === 'live'){
+    shareCardFlip.classList.toggle('is-flipped', cardFlipped);
+    sharePreview.setAttribute('aria-pressed', String(cardFlipped));
+    window.setTimeout(()=>{ flipping = false; }, FLIP_MS);
+    return;
+  }
+  sharePreviewRaster.classList.toggle('is-flipped', cardFlipped);
   sharePreview.setAttribute('aria-pressed', String(cardFlipped));
   window.setTimeout(()=>{ flipping = false; }, FLIP_MS);
 }

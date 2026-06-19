@@ -54,13 +54,79 @@ body{
   font-style:italic;
 }
 
-.share-preview{
+.share-preview-raster{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
   z-index:2;
   cursor:pointer;
+}
+
+.share-preview-live{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:2;
+  cursor:pointer;
+  display:none;
+  perspective:1200px;
+}
+
+@media (min-width:901px){
+  .share-preview-live{
+    display:none !important;
+  }
+}
+
+.share-card-scale{
+  position:relative;
+  width:826px;
+  height:572px;
+  margin:0 auto;
+  transform:scale(var(--share-scale, 1));
+  transform-origin:top center;
+}
+
+.share-card-flip{
+  position:relative;
+  width:826px;
+  height:572px;
+  transform-style:preserve-3d;
+  transform:rotateY(0deg);
+  transition:transform .55s cubic-bezier(.4,0,.2,1);
+}
+
+.share-card-flip.is-flipped{
+  transform:rotateY(180deg);
+}
+
+.share-preview-live .share-card-face{
+  position:absolute;
+  inset:0;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+.share-preview-live .share-card-face--back{
+  transform:rotateY(180deg);
+}
+
+.share-preview-live .postcard-card .pc-frame{
+  display:none;
+}
+
+.share-preview-live .postcard-card--front .pc-photo{
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  border-radius:0;
+}
+
+.share-preview-live .pc-upload-cta{
+  display:none;
 }
 
 .preview-compose{
@@ -132,11 +198,13 @@ body{
   background:linear-gradient(180deg, rgba(0,0,0,.04) 0%, rgba(0,0,0,.08) 100%);
 }
 
-.share-page.is-loading .share-preview{
+.share-page.is-loading .share-preview-raster,
+.share-page.is-loading .share-preview-live{
   display:none;
 }
 
-.share-preview[hidden]{
+.share-preview-raster[hidden],
+.share-preview-live[hidden]{
   display:none !important;
 }
 
@@ -147,17 +215,17 @@ body{
   height:100%;
 }
 
-.share-preview.is-ready .share-card-front,
-.share-preview.is-ready .share-card-back{
+.share-preview-raster.is-ready .share-card-front,
+.share-preview-raster.is-ready .share-card-back{
   opacity:1;
 }
 
-.share-preview.is-flipped .share-card-back{
+.share-preview-raster.is-flipped .share-card-back{
   transform:translate(0,0) rotate(0deg);
   z-index:2;
 }
 
-.share-preview.is-flipped .share-card-front{
+.share-preview-raster.is-flipped .share-card-front{
   transform:translate(10.85%,-18.12%) rotate(13.24deg);
   z-index:1;
 }
@@ -306,6 +374,23 @@ body{
     flex-shrink:0;
   }
 
+  .share-preview-raster{
+    display:none !important;
+  }
+
+  .share-preview-live{
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    overflow:hidden;
+  }
+
+  .share-card-scale{
+    flex:0 0 auto;
+    transform:scale(var(--share-scale, 1));
+    transform-origin:top center;
+  }
+
   .share-card-slot{
     position:relative;
     left:auto;
@@ -317,57 +402,9 @@ body{
     height:auto;
     margin:0 auto;
     flex-shrink:0;
-  }
-
-  .share-preview{
-    position:absolute;
-    inset:0;
-    left:auto;
-    top:auto;
-    width:100%;
-    height:100%;
-    margin:0;
-  }
-
-  /* Full postcard renders — not welcome envelope composition */
-  .share-preview .share-envelope{
-    display:none;
-  }
-
-  .share-card-front,
-  .share-card-back{
-    position:absolute;
-    inset:0;
-    left:0;
-    top:0;
-    width:100%;
-    height:100%;
-    margin:0;
-    object-fit:contain;
-    object-position:center center;
-    transform:none;
-    transform-origin:center center;
-    transition:opacity .35s ease;
-  }
-
-  .share-preview.is-ready .share-card-back{
-    opacity:0;
-  }
-
-  .share-preview.is-ready .share-card-front{
-    opacity:1;
-  }
-
-  .share-preview.is-flipped .share-card-back{
-    opacity:1;
-    transform:none;
-    z-index:2;
-  }
-
-  .share-preview.is-flipped .share-card-front{
-    opacity:0;
-    transform:none;
-    z-index:1;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
   }
 
   .share-panel{

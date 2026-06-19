@@ -148,7 +148,7 @@
   }
 
   .share-card-slot,
-  .share-preview {
+  .share-preview-live {
     margin-top: 0 !important;
     width: min(var(--content-max), calc(100vw - 64px), 320px) !important;
     aspect-ratio: 826 / 572;
@@ -260,7 +260,7 @@
 @media (max-width: 900px) {
   .welcome-preview,
   .share-card-slot,
-  .share-preview {
+  .share-preview-live {
     align-self: center;
     margin-left: auto;
     margin-right: auto;
