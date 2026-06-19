@@ -26,17 +26,20 @@
   </svg>
 </div>
 
-<div class="share-page frame-page" id="sharePage">
+<div class="share-page frame-page is-loading" id="sharePage">
   <div class="share-stage-wrap" id="shareStageWrap">
   <div class="share-stage" id="shareStage">
 
     <h1 class="share-heading">share your <em>postcard!</em></h1>
 
-    <div class="share-preview" id="sharePreview" role="button" tabindex="0" aria-pressed="false" aria-label="Flip postcard preview" aria-live="polite">
-      <div class="preview-compose">
-        <img class="share-envelope" src="assets/welcome/modern/envelope.png" alt="">
-        <img class="share-card-back" id="shareCardBack" src="" alt="">
-        <img class="share-card-front" id="shareCardFront" src="" alt="Your postcard preview">
+    <div class="share-card-slot" id="shareCardSlot">
+      <div class="share-preview-placeholder" id="sharePreviewPlaceholder" aria-hidden="true"></div>
+      <div class="share-preview" id="sharePreview" hidden role="button" tabindex="0" aria-pressed="false" aria-label="Flip postcard preview" aria-live="polite">
+        <div class="preview-compose">
+          <img class="share-envelope" src="assets/welcome/modern/envelope.png" alt="">
+          <img class="share-card-back" id="shareCardBack" src="" alt="">
+          <img class="share-card-front" id="shareCardFront" src="" alt="Your postcard preview">
+        </div>
       </div>
     </div>
 
@@ -70,10 +73,12 @@ import {
 const sharePage = document.getElementById('sharePage');
 const shareStageWrap = document.getElementById('shareStageWrap');
 const shareStage = document.getElementById('shareStage');
+const shareCardSlot = document.getElementById('shareCardSlot');
 const sharePreview = document.getElementById('sharePreview');
+const sharePreviewPlaceholder = document.getElementById('sharePreviewPlaceholder');
 const shareCardFront = document.getElementById('shareCardFront');
 const shareCardBack = document.getElementById('shareCardBack');
-const shareEnvelope = document.querySelector('.share-envelope');
+const shareEnvelope = document.querySelector('#sharePreview .share-envelope');
 const shareLinkText = document.getElementById('shareLinkText');
 const btnCopy = document.getElementById('btnCopy');
 const copyLabel = btnCopy.querySelector('.share-copy-label');
@@ -109,6 +114,42 @@ function applyShareTheme(cardStyle){
   scheduleFit();
 }
 
+let sharePageReady = false;
+
+function hideSharePreviewPlaceholder(){
+  if(sharePreviewPlaceholder){
+    sharePreviewPlaceholder.hidden = true;
+    sharePreviewPlaceholder.style.display = 'none';
+  }
+}
+
+function revealSharePreview(){
+  hideSharePreviewPlaceholder();
+  if(sharePreview){
+    sharePreview.hidden = false;
+    sharePreview.style.display = '';
+  }
+  sharePage.classList.remove('is-loading');
+  sharePageReady = true;
+  scheduleFit();
+}
+
+function getPreviewExport(){
+  if(!new URLSearchParams(window.location.search).has('preview')) return null;
+  const style = new URLSearchParams(window.location.search).get('style') || 'modern';
+  return {
+    style,
+    data: {
+      titleLine1: 'Postcard',
+      titleLine2: 'Vacation',
+      from: 'Julia',
+      to: 'You',
+      message: 'Wish you were here!',
+      photo: null,
+    },
+  };
+}
+
 const { DESIGN_W, DESIGN_H } = FrameBackground;
 const FLIP_MS = 550;
 
@@ -124,6 +165,7 @@ function fitStampSheet(){
 }
 
 function fitStage(){
+  if(!sharePageReady) return;
   const mobile = window.matchMedia('(max-width:900px)').matches;
   shareStage.style.transform = '';
   shareStage.style.width = '';
@@ -163,33 +205,43 @@ function fitStage(){
 }
 
 async function loadCardPreview(shareId){
-  const id = shareId || resolveShareId();
-  if(!id){
-    window.location.replace('postcard-create.html');
-    return null;
+  const preview = getPreviewExport();
+  let id = shareId || resolveShareId();
+  if(!preview){
+    if(!id){
+      window.location.replace('postcard-create.html');
+      return null;
+    }
+    syncShareIdInUrl(id);
   }
-  syncShareIdInUrl(id);
 
-  let saved = null;
-  try {
-    saved = await loadPostcard(id);
-  } catch(err){
-    console.error(err);
+  let saved = preview;
+  if(!saved){
+    try {
+      saved = await loadPostcard(id);
+    } catch(err){
+      console.error(err);
+    }
   }
 
   applyShareTheme(resolvePostcardStyle(saved));
 
   if(saved && saved.data){
     await renderSavedCard(resolvePostcardStyle(saved), saved.data);
-    return id;
+    return id || 'preview';
   }
 
   window.location.replace('postcard-create.html');
   return null;
 }
 
+async function decodeShareImages(){
+  await Promise.all(
+    [shareCardFront, shareCardBack].map((img)=> img.decode?.().catch(()=>{})),
+  );
+}
+
 async function renderSavedCard(style, data){
-  sharePreview.classList.add('is-loading');
   try {
     if(document.fonts && document.fonts.ready){
       await document.fonts.ready;
@@ -199,17 +251,19 @@ async function renderSavedCard(style, data){
       PostcardCard.toDataURL(style, 'front', merged, 2),
       PostcardCard.toDataURL(style, 'back', merged, 2),
     ]);
+    shareCardFront.removeAttribute('src');
+    shareCardBack.removeAttribute('src');
     shareCardFront.src = front;
     shareCardFront.alt = 'Your postcard front';
     shareCardBack.src = back;
     shareCardBack.alt = 'Your postcard back';
+    await decodeShareImages();
     sharePreview.classList.add('is-ready');
+    revealSharePreview();
   } catch(err){
     console.error(err);
     alert('Could not load your postcard');
     window.location.replace('postcard-create.html');
-  } finally {
-    sharePreview.classList.remove('is-loading');
   }
 }
 
@@ -267,14 +321,16 @@ function scheduleFit(){
 }
 
 async function initSharePage(){
-  const shareId = resolveShareId();
+  const preview = getPreviewExport();
+  const shareId = preview ? null : resolveShareId();
   if(shareId){
     syncShareIdInUrl(shareId);
     setShareLink(shareId);
   }
-  await loadCardPreview(shareId);
-  setShareLink(shareId);
-  scheduleFit();
+  const loadedId = await loadCardPreview(shareId);
+  if(loadedId){
+    setShareLink(loadedId);
+  }
 }
 
 initSharePage();

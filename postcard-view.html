@@ -33,13 +33,18 @@
 
     <h1 class="view-heading">you've got a <em>postcard!</em></h1>
 
-    <div class="view-card-stamp" id="viewCardStamp">
-      <img class="view-card-stamp-frame" src="assets/view/stamp-frame-mobile.svg" alt="" aria-hidden="true">
-      <div class="view-card-wrap" id="viewCardWrap" role="button" tabindex="0" aria-label="Flip postcard">
-        <div class="view-card-scale" id="viewCardScale">
-          <div class="view-card-flip" id="cardFlip">
-            <div class="view-card-face view-card-face--front" id="cardFront"></div>
-            <div class="view-card-face view-card-face--back" id="cardBack"></div>
+    <div class="view-card-slot" id="viewCardSlot">
+      <div class="view-card-placeholder" id="viewCardPlaceholder" aria-hidden="true">
+        <img class="view-card-placeholder-frame" src="assets/view/stamp-frame-mobile.svg" alt="">
+      </div>
+      <div class="view-card-stamp" id="viewCardStamp" hidden>
+        <img class="view-card-stamp-frame" src="assets/view/stamp-frame-mobile.svg" alt="" aria-hidden="true">
+        <div class="view-card-wrap" id="viewCardWrap" role="button" tabindex="0" aria-label="Flip postcard">
+          <div class="view-card-scale" id="viewCardScale">
+            <div class="view-card-flip" id="cardFlip">
+              <div class="view-card-face view-card-face--front" id="cardFront"></div>
+              <div class="view-card-face view-card-face--back" id="cardBack"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -80,7 +85,9 @@ const cardFlip = document.getElementById('cardFlip');
 const cardFront = document.getElementById('cardFront');
 const cardBack = document.getElementById('cardBack');
 const btnFlip = document.getElementById('btnFlip');
-const viewCardWrap = document.getElementById('viewCardWrap');
+const viewCardSlot = document.getElementById('viewCardSlot');
+const viewCardPlaceholder = document.getElementById('viewCardPlaceholder');
+const viewCardStamp = document.getElementById('viewCardStamp');
 const viewCta = document.getElementById('viewCta');
 
 const frameBg = FrameBackground.create({
@@ -101,6 +108,9 @@ const STAMP_INNER_H = 0.88659;
 const FLIP_MS = 650;
 const FLIP_EASE = 'cubic-bezier(.4,0,.2,1)';
 
+const viewCardWrap = document.getElementById('viewCardWrap');
+
+let viewPageReady = false;
 let currentStyle = 'modern';
 let cardData = null;
 let showingBack = false;
@@ -159,6 +169,7 @@ function fitCardScale(){
 }
 
 function fitStage(){
+  if(!viewPageReady) return;
   const mobile = window.matchMedia('(max-width:900px)').matches;
   viewStage.style.transform = '';
   viewStage.style.width = '';
@@ -264,10 +275,32 @@ if(viewCardWrap){
 
 btnFlip.addEventListener('click', toggleViewFlip);
 
+function hideViewCardPlaceholder(){
+  if(viewCardPlaceholder){
+    viewCardPlaceholder.hidden = true;
+    viewCardPlaceholder.style.display = 'none';
+  }
+}
+
+function revealViewCard(){
+  hideViewCardPlaceholder();
+  cardFront.replaceChildren();
+  cardBack.replaceChildren();
+  mountCard();
+  if(viewCardStamp){
+    viewCardStamp.hidden = false;
+    viewCardStamp.style.display = '';
+  }
+  viewPage.classList.remove('is-loading');
+  viewPageReady = true;
+  scheduleFit();
+}
+
 function getPreviewExport(){
   if(!new URLSearchParams(window.location.search).has('preview')) return null;
+  const style = new URLSearchParams(window.location.search).get('style') || 'modern';
   return {
-    style: 'modern',
+    style,
     data: {
       titleLine1: 'Postcard',
       titleLine2: 'Vacation',
@@ -308,8 +341,7 @@ async function initViewPage(){
     await document.fonts.ready;
   }
 
-  mountCard();
-  viewPage.classList.remove('is-loading');
+  revealViewCard();
   if(viewCta){
     const ctaUrl = new URL('postcard-create.html', location.href);
     if(currentStyle !== 'modern'){
@@ -317,7 +349,6 @@ async function initViewPage(){
     }
     viewCta.href = ctaUrl.href;
   }
-  scheduleFit();
 }
 
 function scheduleFit(){

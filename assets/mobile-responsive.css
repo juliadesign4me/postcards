@@ -147,6 +147,7 @@
     line-height: 38px !important;
   }
 
+  .share-card-slot,
   .share-preview {
     margin-top: 0 !important;
     width: min(var(--content-max), calc(100vw - 64px), 241px) !important;
@@ -258,6 +259,7 @@
 /* Centered postcard + envelope composition on mobile */
 @media (max-width: 900px) {
   .welcome-preview,
+  .share-card-slot,
   .share-preview {
     align-self: center;
     margin-left: auto;
