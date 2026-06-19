@@ -151,11 +151,8 @@ body{
   transform-style:flat;
 }
 
-.view-card-stamp .postcard-card .pc-frame{
-  display:none;
-}
-
-.view-card-stamp .postcard-card--front .pc-photo{
+/* Vintage view: full-bleed photo without inner frame overlay. */
+.view-card-stamp .postcard-card--vintage.postcard-card--front .pc-photo{
   left:0;
   top:0;
   width:100%;
@@ -163,12 +160,8 @@ body{
   border-radius:0;
 }
 
-.view-card-stamp .postcard-card--front .pc-vintage-inner-frame{
+.view-card-stamp .postcard-card--vintage.postcard-card--front .pc-vintage-inner-frame{
   display:none;
-}
-
-.view-card-stamp .postcard-card--retro70{
-  background:#f5f5f5;
 }
 
 .view-card-flip.is-flipping.show-front .view-card-face--front,
