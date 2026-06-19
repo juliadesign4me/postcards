@@ -35,7 +35,7 @@
 
     <div class="share-card-slot" id="shareCardSlot">
       <div class="share-preview-placeholder" id="sharePreviewPlaceholder" aria-hidden="true"></div>
-      <div class="share-preview-raster" id="sharePreviewRaster" hidden aria-hidden="true">
+      <div class="share-preview-raster" id="sharePreviewRaster" hidden role="button" tabindex="0" aria-pressed="false" aria-label="Flip postcard preview" aria-live="polite">
         <div class="preview-compose">
           <img class="share-envelope" src="assets/welcome/modern/envelope.png" alt="">
           <img class="share-card-back" id="shareCardBack" src="" alt="">
@@ -139,7 +139,6 @@ function hideSharePreviewPlaceholder(){
 
 function setSharePreviewMode(mode){
   const useLive = mode === 'live';
-  sharePreviewMode = mode;
   sharePreviewRaster.classList.toggle('is-active', !useLive);
   sharePreview.classList.toggle('is-active', useLive);
   if(useLive){
@@ -153,30 +152,10 @@ function setSharePreviewMode(mode){
 
 function revealSharePreview(){
   hideSharePreviewPlaceholder();
-  setSharePreviewMode(isShareMobile() ? 'live' : 'raster');
+  setSharePreviewMode('raster');
   sharePage.classList.remove('is-loading');
   sharePageReady = true;
-  lastShareMobile = isShareMobile();
   scheduleFit();
-}
-
-function fitShareLiveCard(){
-  if(!isShareMobile() || sharePreviewMode !== 'live') return;
-  const slotW = shareCardSlot.getBoundingClientRect().width || Math.min(window.innerWidth - 64, 376);
-  const scale = slotW / CARD_W;
-  shareCardScale.style.setProperty('--share-scale', String(scale));
-  shareCardScale.style.width = CARD_W + 'px';
-  shareCardScale.style.height = CARD_H + 'px';
-  shareCardScale.style.transform = '';
-  shareCardScale.style.margin = '0';
-}
-
-function mountShareLiveCard(style, data){
-  shareCardFrontMount.replaceChildren(PostcardCard.createElement(style, 'front', data));
-  shareCardBackMount.replaceChildren(PostcardCard.createElement(style, 'back', data));
-  sharePreviewMode = 'live';
-  shareCardFlip.classList.remove('is-flipped');
-  fitShareLiveCard();
 }
 
 async function mountShareRasterCard(style, data){
@@ -192,7 +171,6 @@ async function mountShareRasterCard(style, data){
   shareCardBack.alt = 'Your postcard back';
   await decodeShareImages();
   sharePreviewRaster.classList.add('is-ready');
-  sharePreviewMode = 'raster';
 }
 
 function getPreviewExport(){
@@ -215,15 +193,6 @@ const { DESIGN_W, DESIGN_H } = FrameBackground;
 const CARD_W = PostcardCard.W;
 const CARD_H = PostcardCard.H;
 const FLIP_MS = 550;
-const FLIP_EASE = 'cubic-bezier(.4,0,.2,1)';
-
-function isShareMobile(){
-  return window.matchMedia('(max-width:900px)').matches;
-}
-
-let sharePreviewMode = 'raster';
-let savedPreviewData = null;
-let lastShareMobile = null;
 
 let cardFlipped = false;
 let flipping = false;
@@ -251,7 +220,6 @@ function fitStage(){
     shareStageWrap.style.overflow = '';
   }
   if(mobile){
-    fitShareLiveCard();
     fitStampSheet();
     return;
   }
@@ -320,12 +288,7 @@ async function renderSavedCard(style, data){
       await document.fonts.ready;
     }
     const merged = Object.assign({}, PostcardCard.DEFAULT_DATA, data);
-    savedPreviewData = { style, data: merged };
-    if(isShareMobile()){
-      mountShareLiveCard(style, merged);
-    } else {
-      await mountShareRasterCard(style, merged);
-    }
+    await mountShareRasterCard(style, merged);
     revealSharePreview();
   } catch(err){
     console.error(err);
@@ -344,14 +307,8 @@ function toggleCardFlip(){
   if(flipping) return;
   flipping = true;
   cardFlipped = !cardFlipped;
-  if(sharePreviewMode === 'live'){
-    shareCardFlip.classList.toggle('is-flipped', cardFlipped);
-    sharePreview.setAttribute('aria-pressed', String(cardFlipped));
-    window.setTimeout(()=>{ flipping = false; }, FLIP_MS);
-    return;
-  }
   sharePreviewRaster.classList.toggle('is-flipped', cardFlipped);
-  sharePreview.setAttribute('aria-pressed', String(cardFlipped));
+  sharePreviewRaster.setAttribute('aria-pressed', String(cardFlipped));
   window.setTimeout(()=>{ flipping = false; }, FLIP_MS);
 }
 
@@ -378,8 +335,8 @@ async function copyShareLink(){
   }, 1600);
 }
 
-sharePreview.addEventListener('click', toggleCardFlip);
-sharePreview.addEventListener('keydown', (e)=>{
+sharePreviewRaster.addEventListener('click', toggleCardFlip);
+sharePreviewRaster.addEventListener('keydown', (e)=>{
   if(e.key === 'Enter' || e.key === ' '){
     e.preventDefault();
     toggleCardFlip();
@@ -388,31 +345,9 @@ sharePreview.addEventListener('keydown', (e)=>{
 
 btnCopy.addEventListener('click', copyShareLink);
 
-async function syncSharePreviewForViewport(){
-  if(!sharePageReady || !savedPreviewData) return;
-  const mobile = isShareMobile();
-  if(lastShareMobile === mobile){
-    if(mobile) fitShareLiveCard();
-    return;
-  }
-  lastShareMobile = mobile;
-  const { style, data } = savedPreviewData;
-  if(mobile){
-    mountShareLiveCard(style, data);
-    setSharePreviewMode('live');
-  } else {
-    await mountShareRasterCard(style, data);
-    setSharePreviewMode('raster');
-  }
-}
-
 function scheduleFit(){
-  syncSharePreviewForViewport();
   fitStage();
-  requestAnimationFrame(()=>{
-    syncSharePreviewForViewport();
-    fitStage();
-  });
+  requestAnimationFrame(fitStage);
 }
 
 async function initSharePage(){

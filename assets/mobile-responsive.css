@@ -148,10 +148,10 @@
   }
 
   .share-card-slot,
-  .share-preview-live.is-active {
+  .share-preview-raster.is-active {
     margin-top: 0 !important;
-    width: min(var(--content-max), calc(100vw - 64px), 320px) !important;
-    aspect-ratio: 826 / 572;
+    width: min(var(--content-max), calc(100vw - 64px), 241px) !important;
+    aspect-ratio: 376 / 343;
     height: auto !important;
     flex-shrink: 1;
     min-height: 0;
@@ -260,11 +260,11 @@
 @media (max-width: 900px) {
   .welcome-preview,
   .share-card-slot,
-  .share-preview-live.is-active {
+  .share-preview-raster.is-active {
     align-self: center;
     margin-left: auto;
     margin-right: auto;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .welcome-copy,
