@@ -137,19 +137,26 @@ function hideSharePreviewPlaceholder(){
   }
 }
 
-function revealSharePreview(){
-  hideSharePreviewPlaceholder();
-  if(isShareMobile()){
+function setSharePreviewMode(mode){
+  const useLive = mode === 'live';
+  sharePreviewMode = mode;
+  sharePreviewRaster.classList.toggle('is-active', !useLive);
+  sharePreview.classList.toggle('is-active', useLive);
+  if(useLive){
     sharePreviewRaster.hidden = true;
-    sharePreview.hidden = false;
-    sharePreview.style.display = '';
+    sharePreview.removeAttribute('hidden');
   } else {
     sharePreview.hidden = true;
-    sharePreviewRaster.hidden = false;
-    sharePreviewRaster.style.display = '';
+    sharePreviewRaster.removeAttribute('hidden');
   }
+}
+
+function revealSharePreview(){
+  hideSharePreviewPlaceholder();
+  setSharePreviewMode(isShareMobile() ? 'live' : 'raster');
   sharePage.classList.remove('is-loading');
   sharePageReady = true;
+  lastShareMobile = isShareMobile();
   scheduleFit();
 }
 
@@ -216,6 +223,7 @@ function isShareMobile(){
 
 let sharePreviewMode = 'raster';
 let savedPreviewData = null;
+let lastShareMobile = null;
 
 let cardFlipped = false;
 let flipping = false;
@@ -380,9 +388,31 @@ sharePreview.addEventListener('keydown', (e)=>{
 
 btnCopy.addEventListener('click', copyShareLink);
 
+async function syncSharePreviewForViewport(){
+  if(!sharePageReady || !savedPreviewData) return;
+  const mobile = isShareMobile();
+  if(lastShareMobile === mobile){
+    if(mobile) fitShareLiveCard();
+    return;
+  }
+  lastShareMobile = mobile;
+  const { style, data } = savedPreviewData;
+  if(mobile){
+    mountShareLiveCard(style, data);
+    setSharePreviewMode('live');
+  } else {
+    await mountShareRasterCard(style, data);
+    setSharePreviewMode('raster');
+  }
+}
+
 function scheduleFit(){
+  syncSharePreviewForViewport();
   fitStage();
-  requestAnimationFrame(fitStage);
+  requestAnimationFrame(()=>{
+    syncSharePreviewForViewport();
+    fitStage();
+  });
 }
 
 async function initSharePage(){

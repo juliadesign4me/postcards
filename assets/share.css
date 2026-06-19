@@ -208,6 +208,17 @@ body{
   display:none !important;
 }
 
+.share-preview-raster.is-active,
+.share-preview-live.is-active{
+  display:block;
+}
+
+@media (max-width:900px){
+  .share-preview-live.is-active{
+    display:flex !important;
+  }
+}
+
 .share-preview-loaded{
   position:absolute;
   inset:0;
@@ -379,10 +390,30 @@ body{
   }
 
   .share-preview-live{
-    display:flex;
     align-items:flex-start;
     justify-content:center;
     overflow:hidden;
+  }
+
+  /* Safari often shows both 3D faces — keep a single face in the layout. */
+  .share-preview-live .share-card-flip{
+    transform-style:flat;
+  }
+
+  .share-preview-live .share-card-face--back{
+    transform:none;
+  }
+
+  .share-preview-live .share-card-flip:not(.is-flipped) .share-card-face--back{
+    display:none !important;
+  }
+
+  .share-preview-live .share-card-flip.is-flipped .share-card-face--front{
+    display:none !important;
+  }
+
+  .share-preview-live .postcard-card--front .pc-vintage-inner-frame{
+    display:none;
   }
 
   .share-card-scale{
