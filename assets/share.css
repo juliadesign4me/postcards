@@ -56,10 +56,9 @@ body{
 
 .share-preview{
   position:absolute;
-  left:532px;
-  top:318px;
-  width:376px;
-  height:343px;
+  inset:0;
+  width:100%;
+  height:100%;
   z-index:2;
   cursor:pointer;
 }
@@ -125,7 +124,8 @@ body{
 
 .share-page.is-loading .share-preview-placeholder{
   display:block;
-  position:relative;
+  position:absolute;
+  inset:0;
   width:100%;
   height:100%;
   border-radius:8px;
