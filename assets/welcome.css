@@ -116,6 +116,130 @@ body{
 .welcome-cta:hover{opacity:.9;}
 .welcome-cta:active{transform:scale(.98);}
 
+.welcome-waitlist{
+  position:relative;
+  left:auto;
+  top:auto;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  width:100%;
+  max-width:430px;
+}
+
+.welcome-waitlist-label{
+  font-family:Inter,system-ui,sans-serif;
+  font-size:16px;
+  line-height:24px;
+  font-weight:500;
+  color:#0c0c0c;
+}
+
+.welcome-waitlist-input{
+  width:100%;
+  height:56px;
+  padding:10px 16px;
+  border:1px solid rgba(0,0,0,.12);
+  border-radius:8px;
+  background:#fff;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  line-height:24px;
+  font-weight:400;
+  color:#0c0c0c;
+  transition:border-color .2s ease,box-shadow .2s ease;
+}
+
+.welcome-waitlist-input::placeholder{
+  color:rgba(0,0,0,.35);
+}
+
+.welcome-waitlist-input:focus{
+  outline:none;
+  border-color:rgba(0,0,0,.35);
+  box-shadow:0 0 0 3px rgba(0,0,0,.06);
+}
+
+.welcome-waitlist-submit{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  width:100%;
+  max-width:270px;
+  height:60px;
+  margin-top:8px;
+  padding:10px 32px;
+  border:none;
+  border-radius:8px;
+  background:#0c0c0c;
+  color:#fff;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  font-weight:500;
+  text-transform:capitalize;
+  cursor:pointer;
+  overflow:hidden;
+  transition:opacity .2s ease,transform .15s ease;
+}
+
+.welcome-waitlist-submit:hover:not(:disabled){opacity:.9;}
+.welcome-waitlist-submit:active:not(:disabled){transform:scale(.98);}
+.welcome-waitlist-submit:disabled{
+  opacity:.65;
+  cursor:wait;
+}
+
+.welcome-waitlist-submit-icon{
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  flex-shrink:0;
+  overflow:hidden;
+}
+
+.welcome-waitlist-submit-icon img{
+  grid-area:1 / 1;
+  display:block;
+  object-fit:contain;
+  max-width:100%;
+  max-height:100%;
+}
+
+.welcome-waitlist-submit-icon img:first-child{
+  width:32px;
+  height:26px;
+}
+
+.welcome-waitlist-submit-icon img:last-child{
+  width:21px;
+  height:15px;
+}
+
+.welcome-waitlist-error{
+  font-family:Inter,system-ui,sans-serif;
+  font-size:14px;
+  line-height:20px;
+  color:#9b1c1c;
+}
+
+.welcome-waitlist-success{
+  position:relative;
+  z-index:2;
+  width:100%;
+  max-width:430px;
+}
+
+.welcome-waitlist-success-text{
+  font-family:'Instrument Serif',Georgia,serif;
+  font-size:32px;
+  line-height:36px;
+  font-style:italic;
+  color:#0c0c0c;
+}
+
 .welcome-cta-icon{
   display:grid;
   place-items:center;
@@ -147,8 +271,7 @@ body{
   width:572px;
   height:563px;
   z-index:2;
-  cursor:pointer;
-  pointer-events:auto;
+  pointer-events:none;
 }
 
 .preview-compose{
@@ -309,6 +432,29 @@ body{
     max-width:none;
     margin:0;
   }
+  .welcome-waitlist,
+  .welcome-waitlist-success{
+    position:relative;
+    left:auto;
+    top:auto;
+    order:4;
+    width:min(var(--content-max, 376px), 100%);
+    max-width:var(--content-max, 376px);
+    margin:50px auto 0;
+    flex-shrink:0;
+  }
+
+  .welcome-waitlist-submit{
+    max-width:none;
+    width:100%;
+  }
+
+  .welcome-waitlist-success-text{
+    font-size:28px;
+    line-height:32px;
+    text-align:center;
+  }
+
   .welcome-cta{
     position:relative;
     left:auto;
@@ -356,16 +502,7 @@ body{
     z-index:1;
   }
   .welcome-styles{
-    position:relative;
-    left:auto;
-    top:auto;
-    order:3;
-    justify-content:center;
-    flex-wrap:nowrap;
-    gap:var(--shell-gap-lg, 24px);
-    margin:24px auto 0;
-    padding-bottom:0;
-    flex-shrink:0;
+    display:none;
   }
   .welcome-style{
     font-size:18px;

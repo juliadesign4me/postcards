@@ -96,15 +96,43 @@
   }
 
   .welcome-styles {
-    margin-top: 20px !important;
-    gap: 16px !important;
-    width: calc(100vw - 32px) !important;
-    max-width: 343px !important;
+    display: none !important;
   }
 
   .welcome-style {
     font-size: 16px !important;
     line-height: 18px !important;
+  }
+
+  .welcome-waitlist {
+    width: calc(100vw - 32px) !important;
+    max-width: 343px !important;
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
+  }
+
+  .welcome-waitlist-submit {
+    width: 100% !important;
+    max-width: none !important;
+    height: 48px !important;
+    padding: 8px 20px !important;
+    font-size: 14px !important;
+    gap: 10px !important;
+  }
+
+  .welcome-waitlist-submit-icon {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .welcome-waitlist-submit-icon img:first-child {
+    width: 24px !important;
+    height: 20px !important;
+  }
+
+  .welcome-waitlist-submit-icon img:last-child {
+    width: 16px !important;
+    height: 12px !important;
   }
 
   .welcome-cta {
@@ -268,8 +296,8 @@
   }
 
   .welcome-copy,
-  .welcome-styles,
-  .welcome-cta,
+  .welcome-waitlist,
+  .welcome-waitlist-success,
   .share-heading,
   .share-panel {
     width: min(var(--content-max, 376px), 100%);
