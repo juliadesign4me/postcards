@@ -4,14 +4,258 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Postcard Generator</title>
-<script>
-(function(){
-  var target = 'postcard-create.html' + (location.search || '');
-  location.replace(target);
-})();
-</script>
-<noscript><meta http-equiv="refresh" content="0; url=postcard-create.html"></noscript>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/frame-background.css">
+<link rel="stylesheet" href="assets/welcome.css">
+<link rel="stylesheet" href="assets/mobile-responsive.css">
+<script src="assets/frame-background.js"></script>
 </head>
 <body>
+<div class="welcome-sheet frame-sheet" id="welcomeSheet" aria-hidden="true">
+  <svg class="welcome-stamp frame-stamp" id="welcomeStamp" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none" overflow="visible">
+    <defs>
+      <mask id="stampMask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+        <rect id="stampMaskFill" fill="#fff"/>
+        <g id="stampHoleCircles" fill="#000"/>
+      </mask>
+    </defs>
+    <rect id="stampFill" mask="url(#stampMask)"/>
+  </svg>
+</div>
+
+<div class="welcome-page frame-page" id="welcomePage" data-style="modern">
+  <div class="welcome-stage-wrap" id="welcomeStageWrap">
+  <div class="welcome-stage" id="welcomeStage">
+
+    <img class="welcome-logo" src="assets/welcome/shared/logo.png" alt="Postcard Maker">
+
+    <div class="welcome-left">
+    <div class="welcome-copy">
+      <h1 class="welcome-heading">
+        <em>create</em><br>
+        your own<br>
+        <u>postcard</u>
+      </h1>
+      <p class="welcome-lead">Make a postcard in any style and send it to someone you miss.</p>
+    </div>
+
+    <a class="welcome-cta" id="welcomeCta" href="postcard-create.html">
+      <span class="welcome-cta-icon" aria-hidden="true">
+        <img src="assets/welcome/shared/btn-stamp-outer.svg" alt="">
+        <img src="assets/welcome/shared/btn-stamp-inner.svg" alt="">
+      </span>
+      <span>create a postcard</span>
+    </a>
+    </div>
+
+    <div class="welcome-preview" id="welcomePreview" role="button" tabindex="0" aria-pressed="false" aria-label="Flip postcard preview" aria-live="polite">
+      <div class="preview-compose">
+        <img class="welcome-envelope" id="previewEnvelope" src="assets/welcome/modern/envelope.png" alt="">
+        <img class="welcome-card-back" id="previewBack" src="assets/welcome/modern/back.png" alt="">
+        <img class="welcome-card-front" id="previewFront" src="assets/welcome/modern/front.png" alt="Modern postcard preview">
+      </div>
+    </div>
+
+    <nav class="welcome-styles" aria-label="Preview style">
+      <button type="button" class="welcome-style is-active" data-style="modern">modern (20s)</button>
+      <button type="button" class="welcome-style" data-style="retro">retro(70s)</button>
+      <button type="button" class="welcome-style" data-style="vintage">vintage (30)</button>
+    </nav>
+
+  </div>
+  </div>
+</div>
+
+<script>
+const STYLES = {
+  modern: {
+    envelope: 'assets/welcome/modern/envelope.png',
+    front: 'assets/welcome/modern/front.png',
+    back: 'assets/welcome/modern/back.png',
+    create: 'postcard-create.html?style=modern',
+    label: 'Modern postcard preview',
+  },
+  retro: {
+    envelope: 'assets/welcome/retro/envelope.png',
+    front: 'assets/welcome/retro/front.png',
+    back: 'assets/welcome/retro/back.png',
+    create: 'postcard-create.html?style=retro70',
+    label: 'Retro postcard preview',
+  },
+  vintage: {
+    envelope: 'assets/welcome/vintage/envelope.png',
+    front: 'assets/welcome/vintage/front.png',
+    back: 'assets/welcome/vintage/back.png',
+    create: 'postcard-create.html?style=vintage',
+    label: 'Vintage postcard preview',
+  },
+};
+
+const welcomePage = document.getElementById('welcomePage');
+const welcomeStageWrap = document.getElementById('welcomeStageWrap');
+const welcomeStage = document.getElementById('welcomeStage');
+const welcomePreview = document.getElementById('welcomePreview');
+const previewEnvelope = document.getElementById('previewEnvelope');
+const previewFront = document.getElementById('previewFront');
+const previewBack = document.getElementById('previewBack');
+const welcomeCta = document.getElementById('welcomeCta');
+const styleButtons = document.querySelectorAll('.welcome-style');
+const welcomeSheet = document.getElementById('welcomeSheet');
+const welcomeStamp = document.getElementById('welcomeStamp');
+const stampFill = document.getElementById('stampFill');
+const stampMask = document.getElementById('stampMask');
+const stampMaskFill = document.getElementById('stampMaskFill');
+const stampHoleCircles = document.getElementById('stampHoleCircles');
+
+const frameBg = FrameBackground.create({
+  sheet: welcomeSheet,
+  stamp: welcomeStamp,
+  stampFill,
+  stampMask,
+  stampMaskFill,
+  stampHoleCircles,
+});
+
+let currentStyle = 'modern';
+let switching = false;
+let cardFlipped = false;
+let flipping = false;
+const FLIP_MS = 550;
+
+const { DESIGN_W, DESIGN_H } = FrameBackground;
+
+function getWelcomeInset(){
+  return frameBg.getInset();
+}
+
+function getViewportSize(){
+  return {
+    w: window.innerWidth,
+    h: window.innerHeight,
+  };
+}
+
+function fitStampSheet(){
+  frameBg.fitStampSheet();
+}
+
+function fitStage(){
+  const mobile = window.matchMedia('(max-width:900px)').matches;
+  welcomeStage.style.transform = '';
+  welcomeStage.style.width = '';
+  welcomeStage.style.height = '';
+  welcomeStage.style.margin = '';
+  welcomeStage.style.transformOrigin = '';
+  welcomePage.style.overflow = mobile ? 'hidden' : '';
+  if(welcomeStageWrap){
+    welcomeStageWrap.style.width = '';
+    welcomeStageWrap.style.height = '';
+    welcomeStageWrap.style.overflow = '';
+  }
+  if(mobile){
+    fitStampSheet();
+    return;
+  }
+  const inset = getWelcomeInset();
+  const { w: vpW, h: vpH } = getViewportSize();
+  const availW = vpW - inset * 2;
+  const availH = vpH - inset * 2;
+  const scale = Math.min(availW / DESIGN_W, availH / DESIGN_H, 1);
+  welcomePage.style.overflow = scale < 1 ? 'auto' : 'hidden';
+  if(scale < 1){
+    welcomeStage.style.transform = `scale(${scale})`;
+    welcomeStage.style.transformOrigin = 'top left';
+    welcomeStage.style.width = `${DESIGN_W}px`;
+    welcomeStage.style.height = `${DESIGN_H}px`;
+    welcomeStage.style.margin = '0';
+    if(welcomeStageWrap){
+      welcomeStageWrap.style.width = `${Math.ceil(DESIGN_W * scale)}px`;
+      welcomeStageWrap.style.height = `${Math.ceil(DESIGN_H * scale)}px`;
+      welcomeStageWrap.style.overflow = 'hidden';
+    }
+  }
+  fitStampSheet();
+}
+
+function resetCardFlip(){
+  cardFlipped = false;
+  flipping = false;
+  welcomePreview.classList.remove('is-flipped');
+  welcomePreview.setAttribute('aria-pressed', 'false');
+}
+
+function toggleCardFlip(){
+  if(switching || flipping) return;
+  flipping = true;
+  cardFlipped = !cardFlipped;
+  welcomePreview.classList.toggle('is-flipped', cardFlipped);
+  welcomePreview.setAttribute('aria-pressed', String(cardFlipped));
+  window.setTimeout(()=>{ flipping = false; }, FLIP_MS);
+}
+
+welcomePreview.addEventListener('click', toggleCardFlip);
+welcomePreview.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' || e.key === ' '){
+    e.preventDefault();
+    toggleCardFlip();
+  }
+});
+
+function setStyle(style){
+  if(style === currentStyle || switching || !STYLES[style]) return;
+  switching = true;
+  resetCardFlip();
+  welcomePreview.classList.add('is-switching');
+
+  window.setTimeout(()=>{
+    const assets = STYLES[style];
+    currentStyle = style;
+    FrameBackground.applyTheme(welcomePage, style);
+    previewEnvelope.src = assets.envelope;
+    previewFront.src = assets.front;
+    previewBack.src = assets.back;
+    previewFront.alt = assets.label;
+    welcomeCta.href = assets.create;
+
+    styleButtons.forEach(btn=>{
+      btn.classList.toggle('is-active', btn.dataset.style === style);
+    });
+
+    welcomePreview.classList.remove('is-switching');
+    switching = false;
+  }, 180);
+}
+
+styleButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=> setStyle(btn.dataset.style));
+});
+
+const initial = new URLSearchParams(location.search).get('style');
+if(initial && STYLES[initial === 'retro70' ? 'retro' : initial]){
+  const key = initial === 'retro70' ? 'retro' : initial;
+  currentStyle = '';
+  setStyle(key);
+}
+
+FrameBackground.applyTheme(welcomePage, currentStyle);
+
+function scheduleFit(){
+  fitStage();
+  requestAnimationFrame(fitStage);
+}
+
+scheduleFit();
+window.addEventListener('resize', scheduleFit);
+window.addEventListener('orientationchange', scheduleFit);
+window.addEventListener('load', scheduleFit);
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', scheduleFit);
+}
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(scheduleFit);
+}
+</script>
 </body>
 </html>
