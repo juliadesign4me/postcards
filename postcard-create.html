@@ -1542,6 +1542,7 @@ body{
 <script type="module">
 import { savePostcard } from './src/postcardStorage.js';
 import { compressImageFile } from './src/imageUpload.js';
+import { openPhotoCropper, photoAspectRatioForStyle } from './src/photoCropper.js';
 import { applyCreatePageAssets } from './assets/create-page-assets.js';
 
 applyCreatePageAssets();
@@ -2120,13 +2121,22 @@ fileInput.addEventListener('change', async ()=>{
   const file = fileInput.files[0];
   fileInput.value = '';
   if(!file) return;
+  let sourceUrl = null;
   try {
     const blob = await compressImageFile(file);
-    setPhotoPreview(blob);
+    sourceUrl = URL.createObjectURL(blob);
+    const aspectRatio = typeof PostcardCard !== 'undefined' && PostcardCard.photoForStyle
+      ? PostcardCard.photoForStyle(currentStyle).ratio
+      : photoAspectRatioForStyle(currentStyle);
+    const cropped = await openPhotoCropper({ imageSrc: sourceUrl, aspectRatio });
+    if(!cropped) return;
+    setPhotoPreview(cropped);
     mountPreview();
   } catch(err){
     console.error(err);
     alert(err.message || 'Could not load image');
+  } finally {
+    if(sourceUrl) URL.revokeObjectURL(sourceUrl);
   }
 });
 
