@@ -1074,6 +1074,7 @@ const PostcardCard = (() => {
     resolveFrontTitleColor,
     RETRO_DEFAULT_TITLE_COLOR,
     VINTAGE_DEFAULT_TITLE_COLOR,
+    photoForStyle,
   };
 })();
 
